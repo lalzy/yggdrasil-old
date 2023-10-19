@@ -1,13 +1,12 @@
 (in-package #:yggdrasil)
 
 #||
-
 What to do:
   Text Area
   Context Menu
   State System
   
-
+  Support for Tiles
 ||#
 
 
