@@ -1,0 +1,17 @@
+(in-package #:yggdrasil)
+
+
+(defun draw-string (x y string &key s-args font (color (get-color white)) draw-type (bg-color (get-color black)))
+  (let ((string (apply #'format nil string s-args))
+	(font (if font font sdl:*default-font*)))
+
+    (case draw-type
+      (:shaded (sdl:draw-string-shaded-* string x y color bg-color :font font))
+      (:blended (sdl:draw-string-blended-* string x y :color color :font font))
+      (t (sdl:draw-string-solid-* string x y :color color :font font)))))
+    
+
+;; to unify making a font for when we go to OpenGL
+(defun make-font (font-name &key (file-path "") (size 15))
+  (sdl:initialise-font
+   (make-instance 'sdl:ttf-font-definition :size size :filename (merge-pathnames font-name file-path))))

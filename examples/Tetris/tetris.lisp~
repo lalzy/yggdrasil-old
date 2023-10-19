@@ -1,0 +1,123 @@
+;;;; breakout.lisp
+(in-package #:tetris)
+
+#|
+
+Loop:
+  If any cell will intersect on next move:
+     Stop and add to tetris grid-map
+  else
+     move down
+
+  check all grid lines, if any line does not have at least 1 zero:
+                             remove line and append new line to top of board.
+
+|#
+
+(defparameter *Shapes* (vector
+			;; I Shape
+			(vector '((0 0 0 0)
+				  (1 1 1 1))
+				'((0 1)
+				  (0 1)
+				  (0 1)
+				  (0 1)))
+			;; T Shape
+			(vector '((0 0 0)
+				  (1 1 1)
+				  (0 1 0))
+				'((0 1 0)
+				  (1 1 0)
+				  (0 1 0))
+				'((0 1 0)
+				  (1 1 1))
+				'((0 1 0)
+				  (0 1 1)
+				  (0 1 0)))
+			;; Z Shape
+			(vector '((1 1 0)
+				  (0 1 1))
+				'((0 1 0)
+				  (1 1 0)
+				  (1 0 0)))
+
+			;; S Shape
+			(vector '((0 1 1)
+				  (1 1))
+				'((0 1 0)
+				  (0 1 1)
+				  (0 0 1)))
+			;; L Shape
+
+			(vector '((0 0 1)
+				  (1 1 1)
+				  (0 0 0))
+				'((0 1 0)
+				  (0 1 0)
+				  (0 1 1))
+				'((0 0 0)
+				  (1 1 1)
+				  (1 0 0))
+				'((1 1 0)
+				  (0 1 0)
+				  (0 1 0)))
+			;; J Shape
+
+			(vector '((0 0 0)
+				  (1 1 1)
+				  (0 0 1))
+				'((0 1)
+				  (0 1)
+				  (1 1))
+				'((1 0 0)
+				  (1 1 1))
+				'((0 1 1)
+				  (0 1 0)
+				  (0 1 0)))
+			;; O Shape
+
+			(vector '((0 0 0)
+				  (0 1 1)
+				  (0 1 1)))
+			;;
+			))
+
+
+(defparameter *current-orientation* 0)
+(defparameter *shape-index* 0)
+
+(defun draw-shape (shape-symbol orientation)
+  (let ((x 32)
+	(y 32)
+	(shape (aref *Shapes* *shape-index*)))
+
+    
+    (dolist (row (aref shape (mod orientation (length shape))))
+      (dolist (cell row)
+	(when (= cell 1)
+	  (yg:draw-rectangle (make-instance 'yg:rectangle :x x :y y :w 32 :h 32) :filled t :color (yg:get-color green))
+	  (yg:draw-rectangle (make-instance 'yg:rectangle :x x :y y :w 32 :h 32) :color (yg:get-color black)))
+	(incf x 32))
+      (setf x 32)
+      (incf y 32))))
+
+(defun main ()
+  (yg:start
+      (:width 640
+       :height 480
+       :clear-color (yg:get-color gray))
+      (:key-down (cond ((yg:is-key :up)
+			(incf *current-orientation*))
+		       ((yg:is-key :right)
+			(if (>= *shape-index* (1- (length *shapes*)))
+			    (setf *Shape-index* 0)
+			    (incf *shape-index*))
+			(setf *current-orientation* 0))
+		       ((yg:is-key :left)
+			(if (<= *shape-index* 0)
+			    (setf *shape-index* (1- (length *shapes*)))
+			    (decf *Shape-index*))
+			(setf *current-orientation* 0))))
+      (:main
+       (draw-shape *shape-index*  *current-orientation*)
+       )))

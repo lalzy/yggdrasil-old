@@ -1,0 +1,103 @@
+;;;; Handles representation of shapes, classes, getters and drawing.
+
+(in-package :yggdrasil)
+
+(defclass position ()
+  ((x :initarg :x)
+   (y :initarg :Y)))
+
+(defclass circle (position)
+  ((radius :initarg :r)))
+
+(defclass rectangle (position)
+  ((width :initarg :w)
+   (height :initarg :h)))
+
+
+(defmethod x ((object array) &optional arg)
+  (if arg
+      (incf (aref object 0) arg)
+      (aref object 0)))
+
+(defmethod x ((object position) &optional arg)
+  (if arg
+      (incf (slot-value object 'x) arg)
+      (slot-value object 'x)))
+
+(defmethod y ((object array) &optional arg)
+  (if arg
+      (incf (aref object 1) arg)
+      (aref object 1)))
+
+(defmethod y ((object position) &optional arg)
+  (if arg
+      (incf (slot-value object 'y) arg)
+      (slot-value object 'y)))
+
+(defmethod w ((object array))
+  (aref object 2))
+
+(defmethod w ((object rectangle))
+  (slot-value object 'width))
+
+(defmethod h ((object array))
+  (aref object 3))
+
+(defmethod h ((object rectangle))
+  (slot-value object 'height))
+
+
+(defmethod r ((object array))
+  (aref object 2))
+
+(defmethod r ((object circle))
+  (slot-value object 'radius))
+
+
+;;; Image getters, to be rewritten for OpenGL
+
+(defmethod w ((object sdl:surface))
+  (sdl:width object))
+
+(defmethod h ((object sdl:surface))
+  (sdl:height object))
+
+;;; Drawing,  this is to ensure when I move to openGL I won't have to change game code later.
+;;;   Any game made with the engine should still be workable after that move('if' I ever get around to that).
+
+(defun adjust-center-position (pos old-length new-length)
+  (- pos (round (- new-length old-length) 2)))
+
+(defun draw-rectangle (rectangle &key (color (get-color green)) (filled nil) (angle 0))
+  (let ((rect (sdl:rectangle :x (x rectangle) :y (y rectangle) :w (w rectangle) :h (h rectangle)))
+	(surface (sdl:create-surface (w rectangle) (h rectangle)))
+	(x (x rectangle))
+	(y (y rectangle)))
+    
+    (if filled
+	(sdl:draw-box-* 0 0 (w rectangle) (h rectangle) :color color :surface surface)
+	(sdl:draw-rectangle-* 0 0 (w rectangle) (h rectangle) :color color :surface surface))
+
+    (when (> angle 0)
+      (setf surface (sdl-gfx:rotate-surface angle :surface surface :smooth t))
+      (when (or (/= angle 0) (/= angle 90) (/= angle 180) (/= angle 360))
+	(setf x (adjust-center-position x (w rectangle) (sdl:width surface))
+	      y (adjust-center-position y (h rectangle) (sdl:height surface)))))
+    
+    
+    (sdl:draw-surface-at-* surface ;(if (> angle 0) (sdl-gfx:rotate-surface angle :surface surface :smooth t) surface)
+		x y)))
+			  ; (x rectangle)   (y rectangle))))
+
+(defun draw-circle (circle &key (color (get-color green)) (filled nil))
+  (let* ((size (+ (* (r circle) 2) 1))
+	 (color-key (if (equalp color (get-color black)) (get-color white) (get-color black)))
+	 (surface (sdl:create-surface size size :color-key color-key)))
+    (sdl:draw-box-* 0 0 size size :color color-key :surface surface)
+    (if filled
+	(sdl:draw-filled-circle-* (r circle) (r circle) (r circle) :color color :surface surface)
+	(sdl:draw-circle-* (r circle) (r circle) (r circle) :color color :surface surface))
+    (sdl:draw-surface-at-* surface (x circle) (y circle))))
+
+
+

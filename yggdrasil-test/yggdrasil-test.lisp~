@@ -1,0 +1,8 @@
+(in-package #:yggdrasil-test)
+
+(defun main (&aux (width 640) (height 480))
+  (yg:start
+      (:width width :height height)
+      (:init (yg::add-button #'(lambda () (format t "hello!"))))
+      
+      (:main (yg::draw-gui))))

@@ -1,0 +1,56 @@
+(in-package :yggdrasil)
+
+(defun calculate-percentage (area percentage)
+  (round (* area (/ (parse-integer percentage) 100))))
+
+;; Check if offset is %
+(defun get-offset-value (size offset)
+  (cond ((numberp offset)
+	 offset)
+	((symbolp offset)
+	 (let ((value (string offset)))
+	   (case (aref value (1- (length value)))
+	     (#\% (calculate-percentage size (subseq value 0 (1- (length value))))))))))
+
+(defun filter-offset (area offsets)
+  (let ((offset-x 0) (offset-y 0))
+    (loop for i below (length offsets) do
+      (cond ((or  (string-equal (elt offsets i) :vert)  (string-equal (elt offsets i) :vertical))
+	     (incf i)
+	     (setf offset-x (get-offset-value (yg:w area) (elt offsets i))))
+	    ((or  (string-equal (elt offsets i) :hor)(string-equal (elt offsets i) :horizontal))
+	     (incf i)
+	     (setf offset-y (get-offset-value (yg:h area) (elt offsets i))))))
+    (vector offset-x offset-y)))
+
+
+(defun place (area object &key (offset nil)  orrientations (inside t))
+  (let ((offsets (filter-offset area offset)))
+    (if inside
+	(place-inside area object offsets orrientations)
+	(place-outside area object offsets orrientations))))
+
+
+(defmethod center ((area rectangle) (object rectangle))
+  (values (+ (round (+ (yg:x area) (yg:w area)) 2)
+	     (round (yg:w object) 2))
+
+	  (+ (round (+ (yg:y area) (yg:h area)) 2)
+	     (round (yg:h object) 2))))
+
+(defmethod place-outside ((area rectangle) (object rectangle) offsets orientations)
+  (multiple-value-bind (x y) (center area object)))
+
+(defmethod place-inside ((area rectangle) (object rectangle) offsets orientations)
+  (multiple-value-bind (x y) (center area object)
+    (dolist (orientation orientations)
+      (case orientation
+	(:left (setf x (1+ (yg:x area))))
+	(:right (setf x (1- (- (+ (yg:x area) (yg:w area)) (yg:w object)))))
+	(:top (setf y (1+ (yg:y area))))
+	(:bottom (setf y (1- (- (+ (yg:y area) (yg:h area)) (yg:h object)))))))
+
+    ;; Set the position
+    (setf (yg:x object) (+ x (x offsets))
+	  (yg:y object) (+ y (y offsets))
+	  )))
