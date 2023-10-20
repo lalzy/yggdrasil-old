@@ -2,39 +2,39 @@
 
 (in-package :yggdrasil)
 
-(defclass position ()
+(defclass pos ()
   ((x :initarg :x)
    (y :initarg :Y)))
 
-(defclass circle (position)
+(defclass circle (pos)
   ((radius :initarg :r)))
 
-(defclass rectangle (position)
+(defclass rectangle (pos)
   ((width :initarg :w)
    (height :initarg :h)))
 
 (defmethod x ((object array))
   (aref object 0))
 
-(defmethod x ((object position))
+(defmethod x ((object pos))
   (slot-value object 'x))
 
 (defmethod (setf x) (value (object array))
   (setf (aref object 0) value))
 
-(defmethod (setf x) (value (object position))
+(defmethod (setf x) (value (object pos))
   (setf (slot-value object 'x) value))
 
 (defmethod y ((object array))
   (aref object 1))
 
-(defmethod y ((object position))
+(defmethod y ((object pos))
   (slot-value object 'y))
 
 (defmethod (setf y) (value (object array))
   (setf (aref object 1) value))
 
-(defmethod (setf y) (value (object position))
+(defmethod (setf y) (value (object pos))
   (setf (slot-value object 'y) value))
 
 (defmethod w ((object array))

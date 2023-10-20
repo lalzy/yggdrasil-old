@@ -6,8 +6,7 @@
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
-  :depends-on (#:lispbuilder-sdl #:lispbuilder-sdl-image  #:lispbuilder-sdl-gfx #:lispbuilder-sdl-ttf ;#:cl-ode
-			#:chipmunk-blob #:bodge-chipmunk	 #:squirl
+  :depends-on (#:lispbuilder-sdl #:lispbuilder-sdl-image  #:lispbuilder-sdl-gfx #:lispbuilder-sdl-ttf
 		#:closer-mop #:cl-gamepad #:bordeaux-threads #:iterate  #:lispbuilder-sdl-ttf)
   :components ((:file "package")
 	       (:file "utility")
