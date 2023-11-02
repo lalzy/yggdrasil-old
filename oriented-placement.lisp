@@ -1,10 +1,14 @@
 (in-package :yggdrasil)
 
 (defun get-center-rectangle-within-window (rect)
+  "return a rectangle placed at the center of the game-window"
   (values (- (round *width* 2) (round (w rect) 2))
           (- (round *height* 2) (round (h rect) 2))
           (w rect)
           (h rect)))
+
+(defgeneric center-within-window (object)
+  (:documentation "places an object in the center of the game-window"))
 
 (defmethod center-within-window ((object rectangle))
   (multiple-value-bind (x y w h) (get-center-rectangle-within-window object)
@@ -23,7 +27,8 @@
   object)
 
 
-(defun place-rectangle-inside-window (rectangle orientations offset-x offset-y)
+(defun place-rectangle-inside-window (rectangle orientations offset-x offset-y offset-as-percentage)
+  "helper to place-within-window"
   ;; Start by centering rectangle
   (multiple-value-bind (x y w h) (get-center-rectangle-within-window rectangle)
     ;; then orient rectangle by orientation, if any
@@ -35,16 +40,27 @@
         (:right (setf x (1- (- *width* w))))
         (:top (setf y 0))
         (:bottom (setf y (1- (- *height* h))))))
-    (setf (x rectangle) (+ x offset-x)
-          (y rectangle) (+ y offset-y)))
+    
+    (if offset-as-percentage
+        (setf (x rectangle) (+ x (round (yg::%-from-total offset-x *width*)))
+              (y rectangle) (+ y (round (yg::%-from-total offset-x *width*)))))
+        
+        (setf (x rectangle) (+ x offset-x)
+              (y rectangle) (+ y offset-y)))
   rectangle)
-      
-(defmethod place-within-window ((object rectangle) &key orientation (offset-x 0) (offset-y 0))
-  (place-rectangle-inside-window object orientation offset-x offset-y))
 
-;; Check size\type for circle\rectangle
-(defmethod place-within-window ((object vector) &key orientation (offset-x 0) (offset-y 0))
-  (place-rectangle-inside-window object orientation offset-x offset-y))
+(defgeneric place-within-window (object &key orientation offset-x offset-y offset-as-percentage)
+  (:documentation "places an object relative within the window
+defaults to the center of the window. Orientation takes either a single, or a list of orientations (left\right, top\bottom)
+
+offset-x\y takes an integer value
+if offset-as-percentage is set, offset-x\y becomes percentages relative to the orientation (not center)"))
+
+(defmethod place-within-window ((object rectangle) &key orientation (offset-x 0) (offset-y 0) offset-as-percentage)
+  (place-rectangle-inside-window object orientation offset-x offset-y  offset-as-percentage))
+
+(defmethod place-within-window ((object vector) &key orientation (offset-x 0) (offset-y 0) offset-as-percentage)
+  (place-rectangle-inside-window object orientation offset-x offset-y  offset-as-percentage))
 
 
 

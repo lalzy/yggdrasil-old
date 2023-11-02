@@ -13,6 +13,10 @@
    :circle
 
    #:get-aspectratio
+
+   ;;; Math
+   #:%-from-total
+   #:%-of-value
    
    ;;; Controlls
    #:mouse-moved-p
