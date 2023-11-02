@@ -1,7 +1,6 @@
+;;;; shapes.lisp
 ;;;; Handles representation of shapes, classes, getters and drawing.
-
 (in-package :yggdrasil)
-
 
 (defclass pos () ;; Exists to abstract away SDL for when\if i move over to openGL
   ((x :initarg :x)
@@ -78,16 +77,13 @@
 ;;; Image getters, to be rewritten for OpenGL
 
 (defmethod w ((object sdl:surface))
-  (sdl:width object))
+,  (sdl:width object))
 
 (defmethod h ((object sdl:surface))
   (sdl:height object))
 
-
-
 ;;; Drawing,  this is to ensure when I move to openGL I won't have to change game code later.
 ;;;   Any game made with the engine should still be workable after that move('if' I ever get around to that).
-
 
 (defun adjust-center-position (pos old-length new-length)
   "returns the center of object (mostly for rectangles that defaults to upper-left)"
