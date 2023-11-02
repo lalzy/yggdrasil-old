@@ -1,5 +1,55 @@
 (in-package :yggdrasil)
 
+(defun get-center-rectangle-within-window (rect)
+  (values (- (round *width* 2) (round (w rect) 2))
+          (- (round *height* 2) (round (h rect) 2))
+          (w rect)
+          (h rect)))
+
+(defmethod center-within-window ((object rectangle))
+  (multiple-value-bind (x y w h) (get-center-rectangle-within-window object)
+    (setf (x object) x
+          (y object) y
+          (w object) w
+          (h object) h))
+  object)
+
+(defmethod center-within-window ((object vector))
+  (multiple-value-bind (x y w h) (get-center-rectangle-within-window object)
+    (setf (x object) x
+          (y object) y
+          (w object) w
+          (h object) h))
+  object)
+
+
+(defun place-rectangle-inside-window (rectangle orientations offset-x offset-y)
+  ;; Start by centering rectangle
+  (multiple-value-bind (x y w h) (get-center-rectangle-within-window rectangle)
+    ;; then orient rectangle by orientation, if any
+    (unless (listp orientations)
+      (setf orientations (cons orientations nil)))
+    (dolist (orientation orientations)
+      (case orientation
+        (:left (setf x 1))
+        (:right (setf x (1- (- *width* w))))
+        (:top (setf y 0))
+        (:bottom (setf y (1- (- *height* h))))))
+    (setf (x rectangle) (+ x offset-x)
+          (y rectangle) (+ y offset-y)))
+  rectangle)
+      
+(defmethod place-within-window ((object rectangle) &key orientation (offset-x 0) (offset-y 0))
+  (place-rectangle-inside-window object orientation offset-x offset-y))
+
+;; Check size\type for circle\rectangle
+(defmethod place-within-window ((object vector) &key orientation (offset-x 0) (offset-y 0))
+  (place-rectangle-inside-window object orientation offset-x offset-y))
+
+
+
+
+#|
 
 ;; Rewrite for outside and inside
 (defun calculate-percentage (area percentage)
@@ -33,7 +83,7 @@
 	(place-outside area object offsets orientations))))
 
 
-(defmethod center ((area rectangle) (object rectangle))
+(defmethod center-within-rectangle ((object rectangle) (area rectangle))
   (let ((x (if (= (yg:w area) (yg:w object))
 	       (yg:x area)
 	       (if (> (yg:w area) (yg:w object))
@@ -47,7 +97,7 @@
 		      (round (yg:h object) 2))
 		   (- (yg:y area) (round (- (yg:h object) (yg:h area)) 2))))))
 
-    (values x y)))
+    (values x y (w rectangle) (h rectangle))))
 
 (defmethod place-outside ((area rectangle) (object rectangle) offsets orientations)
   (multiple-value-bind (x y) (center area object )
@@ -60,7 +110,8 @@
     (setf (yg:x object) (+ x (x offsets))
 	  (yg:y object) (+ y (y offsets)))))
 
-(defmethod place-inside ((area rectangle) (object rectangle) offsets orientations)
+                  ;rectangle ; rectangle
+(defun place-inside (area  object offsets orientations)
   (multiple-value-bind (x y) (center area object)
     (dolist (orientation orientations)
       (case orientation
@@ -73,3 +124,4 @@
     (setf (yg:x object) (+ x (x offsets))
 	  (yg:y object) (+ y (y offsets))
 	  )))
+|#

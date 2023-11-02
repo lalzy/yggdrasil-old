@@ -75,6 +75,13 @@
   (- pos (round (- new-length old-length) 2)))
 
 
+(defun draw-line-* (x-start y-start x-end y-end &key (color (get-color white)) )
+  (sdl:draw-line-* x-start y-start x-end y-end :color color))
+
+(defun draw-line (point1 point2 &key (color (get-color white)))
+  (draw-line-* (x point1) (y point1) (x point2) (y point2) :color color))
+
+
 (defun draw-rectangle-* (x y w h &key (color (get-color green)) (filled nil) (angle 0))
   (unless (edge-collision-check (vector x y w h) t)
     (let ((surface (sdl:create-surface w h :pixel-alpha t)))

@@ -6,19 +6,24 @@
   (:export
    #:start
 
+   :*width*
+   :*height*
+   
    :rectangle
    :circle
-   
+
+   #:get-aspectratio
    
    ;;; Controlls
    #:mouse-moved-p
+   #:get-mouse-position
    #:is-mouse-dir
    #:is-mouse-key
    #:is-mouse-keys ; Checks if any of the passed mouse-buttons are pressed
    #:is-key
    #:is-keys
    #:is-all-keys
-
+   
 
    ;;; Collision \ Positions
    #:collision-check ; Will have proper check between distances
@@ -29,9 +34,14 @@
    #:h
    #:r
 
+   ;;; Alignment
+   #:center-within-window
+   #:place-within-window
+   
    ;;; Drawing
    #:get-color
    #:set-color
+   #:draw-line
    #:draw-rectangle
    #:draw-circle
    #:load-image

@@ -6,6 +6,10 @@
 (defparameter *Current-mouse-buttons* nil)
 (defparameter *mouse-state* 0) ; Possibly remove (?)
 
+(defun get-mouse-position ()
+  (vector (sdl:mouse-x) (sdl:mouse-y)))
+
+
 ;;; Keyboard stuff
 
 (defun filter-special-keys (key)

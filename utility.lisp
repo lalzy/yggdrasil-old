@@ -1,5 +1,8 @@
 (in-package :yggdrasil)
 
+;;
+(defun get-aspectratio ()
+  (/ *height* *width*))
 
 ;; TOdo mirror dolist's functionalities
 (defmacro doarray ((name vector) &body body)
