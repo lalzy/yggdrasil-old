@@ -2,16 +2,23 @@
 
 (in-package :yggdrasil)
 
-(defclass pos ()
+
+(defclass pos () ;; Exists to abstract away SDL for when\if i move over to openGL
   ((x :initarg :x)
-   (y :initarg :Y)))
+   (y :initarg :Y))
+  (:documentation "class for x\y positioning of objects used by the engine"))
 
-(defclass circle (pos)
-  ((radius :initarg :r)))
+(defclass circle (pos) ;; Exists to abstract away SDL for when\if i move over to openGL
+  ((radius :initarg :r))
+  (:documentation "primitive circle-shape used by the engine.")) 
 
-(defclass rectangle (pos)
+(defclass rectangle (pos) ;; Exists to abstract away SDL for when\if i move over to openGL
   ((width :initarg :w)
-   (height :initarg :h)))
+   (height :initarg :h))
+  (:documentation "primitive rectangle-shape used by the engine."))
+
+(defgeneric x (object)
+  (:documentation "getter\setter for x-position, either as vector or as pos object"))
 
 (defmethod x ((object array))
   (aref object 0))
@@ -25,6 +32,9 @@
 (defmethod (setf x) (value (object pos))
   (setf (slot-value object 'x) value))
 
+(defgeneric y (object)
+  (:documentation "getter\setter for y-position, either as vector or as pos object"))
+
 (defmethod y ((object array))
   (aref object 1))
 
@@ -37,11 +47,17 @@
 (defmethod (setf y) (value (object pos))
   (setf (slot-value object 'y) value))
 
+(defgeneric w (object)
+  (:documentation "getter for rectangle width, either as vector or as rectangle object"))
+
 (defmethod w ((object array))
   (aref object 2))
 
 (defmethod w ((object rectangle))
   (slot-value object 'width))
+
+(defgeneric h (object)
+  (:documentation "getter for rectangle height, either as vector or as rectangle object"))
 
 (defmethod h ((object array))
   (aref object 3))
@@ -49,6 +65,8 @@
 (defmethod h ((object rectangle))
   (slot-value object 'height))
 
+(defgeneric r (object)
+  (:documentation "getter for circle radius, either as vector or as circle object"))
 
 (defmethod r ((object array))
   (aref object 2))
@@ -72,17 +90,23 @@
 
 
 (defun adjust-center-position (pos old-length new-length)
-  (- pos (round (- new-length old-length) 2)))
+  "returns the center of object (mostly for rectangles that defaults to upper-left)"
+   (- pos (round (- new-length old-length) 2)))
 
 
-(defun draw-line-* (x-start y-start x-end y-end &key (color (get-color white)) )
+(defun draw-line-* (x-start y-start x-end y-end &key (color (get-color white)))
+  "helper to draw-line, takes absolute values instead of vector\object"
   (sdl:draw-line-* x-start y-start x-end y-end :color color))
 
 (defun draw-line (point1 point2 &key (color (get-color white)))
+  "draws a line from point1 to point2. Points are either vectors, or pos-objects.
+key arguments:
+color - takes an (SDL) color (default white)"
   (draw-line-* (x point1) (y point1) (x point2) (y point2) :color color))
 
 
 (defun draw-rectangle-* (x y w h &key (color (get-color green)) (filled nil) (angle 0))
+  "Helper to draw-rectangle, takes absolute values instead of vector\object"
   (unless (edge-collision-check (vector x y w h) t)
     (let ((surface (sdl:create-surface w h :pixel-alpha t)))
       
@@ -90,23 +114,30 @@
 	  (sdl:draw-box-* 0 0 w h :color color :surface surface)
 	  (sdl:draw-rectangle-* 0 0 w h :color color :surface surface))
 
-      (when (> angle 0)
+      ;; prevents miss-alignment with 'straight' angles.
+      (when (and (> angle 0) (/= angle 90) (/= angle 180) (/ angle 360))
 	(setf surface (sdl-gfx:rotate-surface angle :surface surface :smooth t))
-	(when (or (/= angle 0) (/= angle 90) (/= angle 180) (/= angle 360))
-	  (setf x (adjust-center-position x w (sdl:width surface))
-		y (adjust-center-position y h (sdl:height surface)))))
+        
+        ;; rotate on current-drawn position, rather than placement position
+        ;;   - Unfortunately due to rounding causes minor missalignment
+	(setf x (adjust-center-position x w (sdl:width surface))
+	      y (adjust-center-position y h (sdl:height surface))))
       
       (sdl:draw-surface-at-* surface x y))))
 
-
 (defun draw-rectangle (rectangle &key (color (get-color green)) (filled nil) (angle 0))
+  "draws an rectangle on-screen. Takes an rectangle as either vector or object.
+key arguments:
+color - takes an (SDL) color (default green)
+filled - if set will fill entire rectangle with the color
+angle - Angle to draw\rotate the rectangle (default 0)"
   (if (sdl:video-init-p)
       (draw-rectangle-* (x rectangle) (y rectangle) (w rectangle) (h rectangle) :color color :filled filled :angle angle)
       (error "SDL has not been initialized")))
 
 
-
 (defun draw-circle-* (x y r &key (color (get-color green)) (filled nil))
+  "helper for draw-cricle, takes absolute values instead of vector\object"
     (unless (edge-collision-check (vector x y r) t)
       (let* ((size (+ (* r 2) 1))
 	     (color-key (if (equalp color (get-color black)) (get-color white) (get-color black)))
@@ -120,6 +151,10 @@
 	(sdl:draw-surface-at-* surface (- x r) (- y r)))))
 
 (defun draw-circle (circle &key (color (get-color green)) (filled nil))
+  "draws a circle on-screen. Takes an circle as either vector or object.
+key arguments:
+color - takes an (SDL) color (default green)
+filled - if set will fill entire rectangle with the color"
   (if (sdl:video-init-p)
       (draw-circle-* (x circle) (y circle) (r circle))
       (error "SDL has not been initialized")))
