@@ -1,9 +1,10 @@
 (in-package #:yggdrasil)
 
 #||
-What to do:
-  Text Area
-  Context Menu
+  Create draw-line function
+  Create get width\height function (mirrors sdl:video-dimensions
+                                        
+Context Menu                            
   State System
   
   Support for Tiles
@@ -41,6 +42,8 @@ What to do:
 	       (list :mouse-down-form (rest item)))
 	      ((:mouse-up :mouse-up-event :mouse-button-up-event)
 	       (list :mouse-up-form (rest item)))
+              ((:video-resize-event :video-resize :resize)
+               (list :VIDEO-RESIZE-EVENT (rest item)))
 	      ((:pre-window-init :pre-init)
 	       (list :pre-window-form (rest item)))
 	      ((:time-step :physics :update :update-loop)
@@ -56,15 +59,14 @@ What to do:
       (setf *default-font* (sdl:initialise-font sdl:*ttf-font-vera*))
       (setf *default-font* font)))
 
-(defmacro with-window (width height title fps font &body body)
+(defmacro with-window (width height title fps font resizable &body body)
   `(sdl:with-init ()
      (sdl:init-video)
      (sdl-ttf:init-ttf)
-     
      (initialize-font ,font)
      
      (sdl:enable-unicode)
-     (sdl:window ,width ,height :title-caption ,title :fps (make-instance 'sdl:fps-mixed :dt 1))
+     (sdl:window ,width ,height :title-caption ,title :fps (make-instance 'sdl:fps-mixed :dt 1) :resizable ,resizable)
      (setf (sdl:frame-rate) ,fps)
      ,@body))
 
@@ -75,6 +77,8 @@ What to do:
       (when key
 	(push key new-list))))
   new-list)
+(defparameter *tmp1* nil)
+(defparameter *tmp2* nil)
 
 (defmacro with-events (event-forms clear-color auto-draw)
   "The SDL-Event chain"
@@ -108,6 +112,11 @@ What to do:
 			   (:mouse-button-up-event (:button button)
 						   (setf *current-mouse-buttons* (remove button *current-mouse-buttons*))
 						   ,@(get-event-form :mouse-up-form event-forms))
+                           (:VIDEO-RESIZE-EVENT (:w w :h h)
+                                                (setf *width* w
+                                                      *height* h)
+                                                (sdl:resize-window w h)
+                                                ,@(get-event-form :video-resize-event event-forms))
 			   (:sys-wm-event ()
 					  ,@(get-event-form :window-focus-form event-forms))
 			   (:idle ()
@@ -130,6 +139,7 @@ What to do:
 
 (defmacro start ((&key width height (title "working title") (fps 60)
 		    default-font
+                    resizable
 		    (auto-draw t)
 		    (asset-path "")
 		    clear-color) &rest body)
@@ -138,7 +148,7 @@ What to do:
 		      `(progn 
 			 ,@(get-event-form :pre-window-form event-forms)
 			 (init-globals ,width ,height ,asset-path)
-			 (with-window ,width ,height ,title ,fps ,default-font
+			 (with-window ,width ,height ,title ,fps ,default-font ,resizable
 			   ,@(get-event-form :post-window-form event-forms)
 			   (with-events ,event-forms ,clear-color ,auto-draw)))))))
 
