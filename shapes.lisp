@@ -77,10 +77,23 @@
 ;;; Image getters, to be rewritten for OpenGL
 
 (defmethod w ((object sdl:surface))
-,  (sdl:width object))
+  (sdl:width object))
 
 (defmethod h ((object sdl:surface))
   (sdl:height object))
+
+(defun create-circle-vector-% (&key (x 0) (y 0) (r 1))
+  "Defines an cirlce of radius based on % of total screen size"
+  (vector x y (round (%-of-value r (if (> *width* *height*) *width* *height*)))))
+
+(defun create-rectangle-vector-% (&key (x 0) (y 0) (w 1) (h 1))
+  "Defines an rectangle of size based on % of total screen size"
+  (vector x y (round (%-of-value w *width*)) (round (%-of-value h *height*))))
+
+(defun create-rectangle-object-* (x y w h))
+(defun create-rectangle-object ())
+(defun create-rectangle-object-% ())
+
 
 ;;; Drawing,  this is to ensure when I move to openGL I won't have to change game code later.
 ;;;   Any game made with the engine should still be workable after that move('if' I ever get around to that).
@@ -100,11 +113,14 @@ key arguments:
 color - takes an (SDL) color (default white)"
   (draw-line-* (x point1) (y point1) (x point2) (y point2) :color color))
 
-
-(defun draw-rectangle-* (x y w h &key (color (get-color green)) (filled nil) (angle 0))
+(defun draw-rectangle-* (x y w h &key (color (get-color green)) (filled nil) (angle 0) from-center)
   "Helper to draw-rectangle, takes absolute values instead of vector\object"
   (unless (edge-collision-check (vector x y w h) t)
     (let ((surface (sdl:create-surface w h :pixel-alpha t)))
+
+      (if from-center
+          (setf x (- x (round w 2))
+                y (- y (round h 2))))
       
       (if filled
 	  (sdl:draw-box-* 0 0 w h :color color :surface surface)
@@ -121,16 +137,16 @@ color - takes an (SDL) color (default white)"
       
       (sdl:draw-surface-at-* surface x y))))
 
-(defun draw-rectangle (rectangle &key (color (get-color green)) (filled nil) (angle 0))
+(defun draw-rectangle (rectangle &key (color (get-color green)) (filled nil) (angle 0) from-center)
   "draws an rectangle on-screen. Takes an rectangle as either vector or object.
 key arguments:
 color - takes an (SDL) color (default green)
 filled - if set will fill entire rectangle with the color
 angle - Angle to draw\rotate the rectangle (default 0)"
   (if (sdl:video-init-p)
-      (draw-rectangle-* (x rectangle) (y rectangle) (w rectangle) (h rectangle) :color color :filled filled :angle angle)
+      (draw-rectangle-* (x rectangle) (y rectangle) (w rectangle) (h rectangle) :color color :filled filled
+                                                                                :angle angle :from-center from-center)
       (error "SDL has not been initialized")))
-
 
 (defun draw-circle-* (x y r &key (color (get-color green)) (filled nil))
   "helper for draw-cricle, takes absolute values instead of vector\object"
@@ -152,5 +168,5 @@ key arguments:
 color - takes an (SDL) color (default green)
 filled - if set will fill entire rectangle with the color"
   (if (sdl:video-init-p)
-      (draw-circle-* (x circle) (y circle) (r circle))
+      (draw-circle-* (x circle) (y circle) (r circle) :color color :filled filled)
       (error "SDL has not been initialized")))
