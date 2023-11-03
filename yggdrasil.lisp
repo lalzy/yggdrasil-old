@@ -112,7 +112,7 @@ Context Menu
 			   (:mouse-button-up-event (:button button)
 						   (setf *current-mouse-buttons* (remove button *current-mouse-buttons*))
 						   ,@(get-event-form :mouse-up-form event-forms))
-                           (:VIDEO-RESIZE-EVENT (:w w :h h)
+                           (:video-resize-event (:w w :h h)
                                                 (setf *width* w
                                                       *height* h)
                                                 (sdl:resize-window w h)
