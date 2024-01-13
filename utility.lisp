@@ -1,5 +1,18 @@
 (in-package :yggdrasil)
 
+(defun length-1 (sequence)
+  "Returns one less than the length of the sequence."
+  (1- (length sequence)))
+
+(defun ends-in-symbol (string symbol)
+  (string-equal symbol (subseq string (length-1 string))))
+
+(defun is-valid-symbol (argument symbol)
+  (ends-in-symbol-p (if (symbolp argument)
+                        (string argument)
+                        argument)
+                    symbol))
+
 ;;
 (defun get-aspectratio ()
   (/ *height* *width*))

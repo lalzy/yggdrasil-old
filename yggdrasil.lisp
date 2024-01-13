@@ -151,5 +151,3 @@ Context Menu
 			 (with-window ,width ,height ,title ,fps ,default-font ,resizable
 			   ,@(get-event-form :post-window-form event-forms)
 			   (with-events ,event-forms ,clear-color ,auto-draw)))))))
-
-
