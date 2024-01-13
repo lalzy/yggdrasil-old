@@ -30,6 +30,7 @@
    
 
    ;;; Collision \ Positions
+   #:mouse-collision-check
    #:collision-check ; Will have proper check between distances
    #:edge-collision-check
    #:x
@@ -39,8 +40,7 @@
    #:r
 
    ;;; Alignment
-   #:center-within-window
-   #:place-within-window
+   #:place-within
    
    ;;; Drawing
    #:get-color
