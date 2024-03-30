@@ -63,6 +63,12 @@
 (defmethod edge-collision-check ((object circle) &optional beyond)
   (edge-circle-collision object beyond))
 
+(defun rectangle-or-circle (vector)
+  (cond ((= (length vector) 3)
+         :circle)
+        ((= (length vector) 4)
+         :rectangle)))
+
 (defmethod edge-collision-check ((object array) &optional beyond)
   (let ((obj1-type (rectangle-or-circle object)))
     (cond ((equal obj1-type :none) (error "~a is not a rectangle or circle array" object))
@@ -118,3 +124,57 @@ If beyond is set, will only be considered intersection if object is past window"
 (defun get-edge-dir (object dir &key (beyond nil))
   "Check if object is coliding with the chosen direction"
   (member dir (edge-collision-check object beyond) :test #'string=))
+
+
+
+
+
+
+#|
+
+(defstruct circle
+  (x 0)
+  (y 0)
+  (radius 0))
+
+(defstruct oriented-rectangle
+  (x 0)
+  (y 0)
+  (width 0)
+  (height 0)
+  (angle 0)) ; Angle in radians
+
+(defun rotate-point (point angle)
+  "Rotate a point around the origin by a given angle in radians."
+  (let* ((x (car point))
+         (y (cadr point))
+         (new-x (+ (* x (cos angle)) (* y (- (sin angle))))))
+    (list new-x (+ (* x (sin angle)) (* y (cos angle))))))
+
+(defun project-onto-axis (points axis)
+  "Project a list of points onto a given axis."
+  (let ((projections (mapcar (lambda (point) (dot-product point axis)) points)))
+    (list (min projections) (max projections))))
+
+(defun separating-axis-theorem-circle-rectangle (circle rectangle)
+  "Check for collision between a circle and an oriented rectangle using the Separating Axis Theorem."
+  (labels ((axis-collide-p (axis)
+             (let* ((rectangle-points (list
+                                        (list (x rectangle) (y rectangle))
+                                        (list (+ (x rectangle) (width rectangle)) (y rectangle))
+                                        (list (x rectangle) (+ (y rectangle) (height rectangle)))
+                                        (list (+ (x rectangle) (width rectangle)) (+ (y rectangle) (height rectangle)))))
+                    (rotated-rectangle-points (mapcar (lambda (point) (rotate-point point (angle rectangle))) rectangle-points))
+                    (circle-point (list (circle-x circle) (circle-y circle)))
+                    (rotated-circle-point (rotate-point circle-point (angle rectangle)))
+                    (rectangle-projection (project-onto-axis rotated-rectangle-points axis))
+                    (circle-projection (project-onto-axis (list rotated-circle-point) axis)))
+               (not (or (< (cadr rectangle-projection) (car circle-projection))
+                        (< (cadr circle-projection) (car rectangle-projection)))))))
+    (and (axis-collide-p '(1 0)) ; Check overlap on the x-axis
+         (axis-collide-p '(0 1)) ; Check overlap on the y-axis
+         (axis-collide-p (normalize (list (- (circle-x circle) (x rectangle))
+                                          (- (circle-y circle) (y rectangle))))))) ; Check overlap on the axis perpendicular to the rectangle's orientation
+In this implementation, I've added a circle struct and an oriented-rectangle struct for representing circles and oriented rectangles, respectively. The rotate-point function rotates a point around the origin, and project-onto-axis projects a list of points onto a given axis. The main function separating-axis-theorem-circle-rectangle then checks for collision between a circle and an oriented rectangle using the SAT. It also checks for overlap along an axis perpendicular to the rectangle's orientation. Note that this code assumes that the normalize and dot-product functions are defined elsewhere.
+
+|#

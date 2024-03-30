@@ -52,7 +52,11 @@
    #:draw-image
    #:find-image
 
-
+   ;;; Drawing-Helper
+   #:allocate-cells
+   #:cell-count
+   #:cell-list
+   
    ;;; Context Menu
    #:init-context-menu
    #:menu-change-font

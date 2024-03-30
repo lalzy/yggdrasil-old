@@ -124,7 +124,15 @@ Context Menu
 
 				  (sdl:with-timestep ()
 				    ,@(get-event-form :timestep-form event-forms))
-				  
+
+                                  (when (check-state :quit)
+                                    (sdl:push-quit-event))
+
+                                  (when (check-state :game)
+                                    ;;Animation update
+                                    (update-animations)
+                                    )
+                                  
 				  (when ,auto-draw
 				    (dolist (image *auto-draw-list*)
 				      (draw-image image)))

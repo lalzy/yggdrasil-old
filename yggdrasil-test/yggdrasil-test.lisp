@@ -1,42 +1,29 @@
 (in-package #:yggdrasil-test)
 
-(defparameter *map* #(
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 2 2 2 2 1 1 2 2 2 2 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 )
-#(2 2 2 2 2 2 1 1 2 2 2 2 2 2 2 )))
+;; Fix 'space as symbol issue with is-key
 
-(defun draw-map (map )
-  (let ((x 0)
-	(y 0)
-	(w 32)
-	(h 32))
-
-    (loop :for row :From 0 :to (1- (length map)) :do
-      (loop :for col :from 0 :to (1- (length (aref map row))) :do
-	(let ((tile (aref (aref map row) col)))
-	  (cond ((= tile 1)
-		 (yg::draw-rectangle-* (* col w) (* row h) w h :color (yg:get-color blue) :filled t))
-		((= tile 2)
-		 (yg::draw-rectangle-* (* col w) (* row h) w h :color (yg:get-color green) :filled t))
-		(t
-		 (yg::draw-rectangle-* (* col w) (* row h) w h :color (yg:get-color black) :filled t)))
-	  (yg::draw-rectangle-* (* col w) (* row h) w h :color (yg:get-color red)))))))
+(defclass player ()
+  ((idle-sprite :initarg :idle :accessor idle)
+   (attack-sprite :initarg :attack :accessor attack)))
 
 (defun main (&aux (width 640) (height 480))
-  (let ((player (make-instance 'yg:rectangle :x 0 :y 0 :w 25 :h 25)))
+  (let (player)
+    
     (yg:start
-	(:width width :height height)
-	(:main
-	 (draw-map *map*)
-	 ;(yg:draw-rectangle player :color (yg:get-color blue) :filled t)
-	 ))))
+     (:width width :height height)
+     (:key-down
+      (when (yg::check-state :game)
+        (when (yg:is-key :a)
+          (yg::play-animation (attack player))))
+      (when (yg:is-key :space)
+        (cond ((yg::check-state :menu) (yg::set-state :game))
+              ((yg::check-state :game) (yg::set-state :menu)))))
+     (:init
+      (setf player (make-instance 'player :attack (yg::create-animated-sprite "_Attack.png" (yg:allocate-cells 720 80 120 80) :path "C:/Coding Projects/CL-Projects/aquam/assets/"))))
+      
+     (:main
+      (yg:draw-string 0 0 "press space to pause/unpause")
+      (yg::with-state :menu
+        (yg:draw-string 220 30 "paused")
+        (yg::update-animations))
+      (yg::draw-animation (attack player))))))

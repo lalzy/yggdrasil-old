@@ -14,6 +14,7 @@
 	       (:file "colors")
 	       (:file "shapes")
 	       (:file "images")
+               (:file "animation")
 	       (:file "sprites")
 	       (:file "text")
 	       (:file "controll-input")
@@ -21,4 +22,5 @@
 	       (:file "oriented-placement")
 	       (:file "context-menu")
 	       (:file "GUI")
+               (:file "states")
                (:file "yggdrasil")))

@@ -61,9 +61,12 @@
 
 ;; Rewrite to properly handle special symbols
 (defmethod is-key ((key symbol) &key case-sensitive)
-  
-  (is-key-helper (if (member key *special-symbols*) key (character key)
-		     ) case-sensitive))
+  (when (string= key :space) (setf key #\space)) ; Doesn't like :space
+  (is-key-helper (if (member key *special-symbols*)
+                     key
+                     (character key))
+                 case-sensitive))
+
 ;; Checks if any of the keys are pressed
 (defun is-keys (list-of-keys))
 
