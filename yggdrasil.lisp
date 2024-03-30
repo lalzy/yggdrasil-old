@@ -122,15 +122,16 @@ Context Menu
 			   (:idle ()
 				  (sdl:clear-display  (if ,clear-color ,clear-color (get-color black)))
 
-				  (sdl:with-timestep ()
-				    ,@(get-event-form :timestep-form event-forms))
-
                                   (when (check-state :quit)
                                     (sdl:push-quit-event))
 
                                   (when (check-state :game)
                                     ;;Animation update
                                     (update-animations)
+                                    
+				    (sdl:with-timestep ()
+				      ,@(get-event-form :timestep-form event-forms))
+
                                     )
                                   
 				  (when ,auto-draw
@@ -149,8 +150,9 @@ Context Menu
 		    default-font
                     resizable
 		    (auto-draw t)
-		    (asset-path "")
+                    (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) "assets/"))
 		    clear-color) &rest body)
+  ""
   (unwind-protect (progn
 		    (let ((event-forms (filter-events body)))
 		      `(progn 
@@ -159,3 +161,7 @@ Context Menu
 			 (with-window ,width ,height ,title ,fps ,default-font ,resizable
 			   ,@(get-event-form :post-window-form event-forms)
 			   (with-events ,event-forms ,clear-color ,auto-draw)))))))
+
+;; redo asset path when making executable
+(defun make-executable ()
+  "create an executable for current game/project")
