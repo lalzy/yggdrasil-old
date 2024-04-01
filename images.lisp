@@ -1,9 +1,13 @@
 (in-package :yggdrasil)
+;;; Double-check cells for vertical-flipping, to ensure this works correctly.
+;;;  > And or fix it.
+
 
 (defclass image (rectangle)
   ((image-name :initarg :name :accessor name)
-   (image-data :initarg :image)
+   (image-data :initarg :image :accessor image-data)
    (sprite-cells :initarg :cells :accessor cell-list)
+   (flipped :initform nil :accessor flipped)
    (cell-count :initarg :cell-count :accessor cell-count)))
 
 
@@ -55,9 +59,27 @@ Size-x\y = where the pixles will separate the cells"
 	     ,@(when x (list :x x))
 	     ,@(when y (list :y y)))))
     (apply #'draw-image arguments)))
-                                        ; (draw-image (find-image image-name) :x x :y y))
+;; (draw-image (find-image image-name) :x x :y y))
 
-;; Reduntant in SDL, not reduntant with OpenGL
+(defun flip-image (image &key  (horizontal t) vertical)
+  "Flips the image.
+Parameters:
+
+horizontal - flips it horizontally
+vertical - flips it vertically"
+  (let ((flipped-image (sdl-gfx:zoom-surface (if horizontal -1 1) (if vertical -1 1) :surface (slot-value image 'image-data))))
+
+    ;;(setf (flipped image) (not (flipped image)))
+    (toggle-variable (flipped image))
+    
+    (when (cell-list image)
+      (setf (sdl:cells flipped-image) (if (flipped image)
+                                          (reverse (cell-list image))
+                                          (cell-list image))))
+    
+    (setf (slot-value image 'image-data) flipped-image)))
+
+;; Reduntant in SDL, not reduntant with OpenGL whenever I transition
 (defun draw-image (image &key (x (slot-value image 'x)) (y (slot-value image 'y)) cell)
   ;; Ensure image cordinates is always same as drawn cordinates
   (unless (and image (edge-collision-check image t))

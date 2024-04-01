@@ -1,13 +1,15 @@
 (in-package #:yggdrasil)
 
 #||
-  Create draw-line function
-  Create get width\height function (mirrors sdl:video-dimensions
-                                        
-Context Menu                            
-  State System
-  
-  Support for Tiles
+Create a new asset-path system:
+  Asset-path = root-path for assets
+  Functions to overwrite\append to asset-path root
+  Separate paths for separated assets based on root.
+    > Images
+    > Fonts
+    > Sounds
+
+
 ||#
 
 
@@ -150,9 +152,18 @@ Context Menu
 		    default-font
                     resizable
 		    (auto-draw t)
-                    (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) "assets/"))
+                    (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) ""))
 		    clear-color) &rest body)
-  ""
+  "Arguments:
+:width (integer): Width of the window.
+:height (integer): Height of the window.
+:title (string): Title of the window.
+:fps (integer): Frames per second the window should run at.
+:default-font (string or Pathname to file): Font to use as the base-font.
+:resizable (boolean): Whether the window can be resized or not.
+:auto-draw (boolean): Automatically draw loaded images or animations.
+:asset-path (String or Pathname): Default path to look for any/all assets.
+:clear-color (SDL:Color): Base color used to reset the window."
   (unwind-protect (progn
 		    (let ((event-forms (filter-events body)))
 		      `(progn 

@@ -14,6 +14,11 @@
 
    #:get-aspectratio
 
+   ;;; State
+   #:check-state
+   #:with-state
+   #:set-state
+   
    ;;; Math
    #:%-from-total
    #:%-of-value
@@ -51,7 +56,16 @@
    #:load-image
    #:draw-image
    #:find-image
-
+   #:flip-image
+   
+   ;; animation
+   #:create-animated-sprite
+   #:draw-animation
+   #:play-animation
+   #:update-animations
+   #:is-animation-playing?
+   #:flip-animation
+   
    ;;; Drawing-Helper
    #:allocate-cells
    #:cell-count
@@ -68,4 +82,7 @@
    #:Make-font
    #:draw-string
    #:draw-string-*
+
+   ;;; Utility
+   #:toggle-variable
    ))

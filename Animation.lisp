@@ -1,14 +1,8 @@
 (in-package :yggdrasil)
 
-;; Rework animation-set class
-;;    > Need to keep track of amount of cells
-
-
-;; 
-
-;; Rewrite to use named system, so that it's easy to remove\delete animations
 (defparameter *animated-sprites-to-animate* nil)
-
+;;; TODO:
+;;;   Change play-animation system to work with other states than just 'game' state.
 
 (defclass animation-set ()
   ((animation-name :initarg :interval :accessor name)
@@ -25,7 +19,7 @@
       (push animated-sprite *animated-sprites-to-animate*))
     animated-sprite))
 
-(defun draw-animation (animation-object &key x y )
+(defun draw-animation (animation-object &key x y)
   (let ((sprite (sprite animation-object)))
     (draw-image (sprite animation-object) :x (if x x (x sprite)) :y (if y y (y sprite)) :cell (current-animation animation-object))))
 
@@ -33,18 +27,27 @@
   (unless (find animation-object *animated-sprites-to-animate*)
     (push animation-object *animated-sprites-to-animate*)))
 
+(defun is-animation-playing? (animation-object)
+  (find animation-object *animated-sprites-to-animate*))
+
 
 (defun next-animation-cell (animation-object)
+  "returns object when finished, otherwise returns nil"
   (if (>= (animation-counter animation-object) (animation-interval animation-object))
       (progn (if (>= (current-animation animation-object) (1- (cell-count (sprite animation-object))))
                  (progn
                    (setf (current-animation animation-object) 0)
+                   (setf (animation-counter animation-object) 0)
                    (setf *animated-sprites-to-animate* (remove animation-object *animated-sprites-to-animate*)))
-                  
+                 
                  (incf (current-animation animation-object)))
              (setf (animation-counter animation-object) 0))
-      (incf (animation-counter animation-object))))
+      (incf (animation-counter animation-object)))
+  nil)
 
 (defun update-animations ()
   (dolist (animation *animated-sprites-to-animate*)
       (next-animation-cell animation)))
+
+(defun flip-animation (animation-object &key  (horizontal t) vertical)
+  (flip-image (sprite animation-object) :horizontal horizontal :vertical vertical))

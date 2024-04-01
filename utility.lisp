@@ -54,3 +54,8 @@
     (if as-vector
 	(vector x y size circle)
 	(make-instance 'circle :x x :y y :r size))))
+
+;; Rename to something shorter
+(defmacro toggle-variable (variable)
+  "Switches the boolean state of passed variable (destructive macro)"
+  `(setf ,variable (not ,variable)))
