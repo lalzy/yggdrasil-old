@@ -27,6 +27,8 @@ Examples for how to use the various components for the engine can be found in th
 
 
 The current plans for the engine are in no particular order:
+
+Proper error-handling (Message-Box when compiled) that works for both Windows and Linux.
 An UI system (scrollbars, textfields, window-frames, buttons, etc).
 Proper collisions, and\or physics engine (probably tied to Box2D)
 Object-rotation (semi-implemented) + collision for said rotated objects
