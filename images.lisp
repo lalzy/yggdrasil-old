@@ -28,8 +28,8 @@ Size-x\y = where the pixles will separate the cells"
 (defun remove-image (image-name))
 (defun find-image (image-name)
   (doarray (image *images*)
-    (when (string-equal (slot-value image 'image-name) image-name)
-      (return-from find-image image))))
+           (when (string-equal (name image) image-name)
+             (return-from find-image image))))
 
 
 (defun remove-from-auto-draw (image-name))
@@ -46,7 +46,7 @@ Size-x\y = where the pixles will separate the cells"
     (vector-push-extend image *images*)
 
     (when sprite-cells
-      (setf (sdl:cells (slot-value image 'image-data)) sprite-cells))
+      (setf (sdl:cells (image-data image)) sprite-cells))
     
     (when auto-draw
       (push image *auto-draw-list*))
@@ -67,7 +67,7 @@ Parameters:
 
 horizontal - flips it horizontally
 vertical - flips it vertically"
-  (let ((flipped-image (sdl-gfx:zoom-surface (if horizontal -1 1) (if vertical -1 1) :surface (slot-value image 'image-data))))
+  (let ((flipped-image (sdl-gfx:zoom-surface (if horizontal -1 1) (if vertical -1 1) :surface (image-data image))))
 
     ;;(setf (flipped image) (not (flipped image)))
     (toggle-variable (flipped image))
@@ -77,12 +77,12 @@ vertical - flips it vertically"
                                           (reverse (cell-list image))
                                           (cell-list image))))
     
-    (setf (slot-value image 'image-data) flipped-image)))
+    (setf (image-data image) flipped-image)))
 
 ;; Reduntant in SDL, not reduntant with OpenGL whenever I transition
-(defun draw-image (image &key (x (slot-value image 'x)) (y (slot-value image 'y)) cell)
+(defun draw-image (image &key (x (x image)) (y (y image)) cell)
   ;; Ensure image cordinates is always same as drawn cordinates
   (unless (and image (edge-collision-check image t))
-    (setf (slot-value image 'x) x
-	  (slot-value image 'y) y)
-    (sdl:draw-surface-at-* (slot-value image 'image-data) x y :cell cell)))
+    (setf (x image) x
+          (y image) y)
+    (sdl:draw-surface-at-* (image-data image) x y :cell cell)))

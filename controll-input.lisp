@@ -1,6 +1,5 @@
 (in-package #:yggdrasil)
 
-
 (defparameter *keys-pressed* nil) ; List of current key pressed(first element is sdl-state-key, second is unicode key)
 (defparameter *mouse-move-direction* #(none none))
 (defparameter *Current-mouse-buttons* nil)

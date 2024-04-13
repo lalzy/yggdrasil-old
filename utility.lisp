@@ -13,6 +13,18 @@
                         argument)
                     symbol))
 
+;;; File handling
+(defun create-filename (filename file-extention)
+  (format nil "~a.~a" filename file-extention))
+
+(defun create-file-path (filename file-path file-extention)
+  (or (probe-file (merge-pathnames (create-filename filename file-extention) file-path))
+      (error (format nil "file: [~a.~a] in [~a] does not exist" filename file-extention file-path))))
+
+(defun verify-file (file path extention)
+  "Verifies that the file exist"
+  (or (namestring (uiop:probe-file* (create-file-path file path extention))) (error "[~a.~a] does not exist in ~a" file extention path)))
+
 ;;
 (defun get-aspectratio ()
   (/ *height* *width*))

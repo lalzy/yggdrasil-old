@@ -10,6 +10,7 @@
 		#:closer-mop #:cl-gamepad #:bordeaux-threads #:iterate  #:lispbuilder-sdl-ttf)
   :components ((:file "package")
 	       (:file "utility")
+               (:file "cffi/SDL")
 	       (:file "math")
 	       (:file "colors")
 	       (:file "shapes")

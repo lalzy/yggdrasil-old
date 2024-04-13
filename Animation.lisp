@@ -3,6 +3,7 @@
 (defparameter *animated-sprites-to-animate* nil)
 ;;; TODO:
 ;;;   Change play-animation system to work with other states than just 'game' state.
+;;;   Add support for pausing animations
 
 (defclass animation-set ()
   ((animation-name :initarg :interval :accessor name)
@@ -51,3 +52,5 @@
 
 (defun flip-animation (animation-object &key  (horizontal t) vertical)
   (flip-image (sprite animation-object) :horizontal horizontal :vertical vertical))
+
+(defun pause-animation (animation-object))

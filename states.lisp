@@ -11,9 +11,9 @@
 ;; Support adding new states to any of the 3 main states.
 
 
-(defparameter *state* :menu) ; Default state is menu
+(defparameter *state* :setup) ; Default state is menu
 
-(defparameter *states* '(:game :quit :menu)) ; Various states available
+(defparameter *states* '(:game :quit :menu :setup)) ; Various states available
 
 (defun set-state (state)
   "Sets the game state"

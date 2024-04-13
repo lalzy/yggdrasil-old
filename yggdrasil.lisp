@@ -1,6 +1,11 @@
 (in-package #:yggdrasil)
 
 #||
+
+Fix\improve error-handling (error-messages when failing to create images, fonts, etc)
+
+Option for automatic-click interaction on drawn shapes\images
+
 Create a new asset-path system:
   Asset-path = root-path for assets
   Functions to overwrite\append to asset-path root
@@ -9,66 +14,80 @@ Create a new asset-path system:
     > Fonts
     > Sounds
 
-
+replace loop with iter(?)
 ||#
 
 
 (defparameter *width* nil)
 (defparameter *height* nil)
 (defparameter *asset-path* nil)
+(defparameter *font-path* nil)
 
 
-(defun init-globals (width height asset-path)
+(defun init-globals (width height asset-path font-path)
   (setf *width* width
 	*height* height
-	*asset-path* asset-path))
+	*asset-path* asset-path
+        *font-path* font-path))
 
 (defun filter-events (body)
   "Filters out the synonymous keywords into a unified keyword"
   (iter (for item :in body)
-	(collect
-	    (case (first item)
-	      ((:main :idle)
-	       (list :main-form (rest item)))
-	      ((:window-focus :window-focus-event)
-	       (list :window-focus-form (rest item)))
-	      ((:quit :end :quit-event)
-	       (list :end-form (rest item)))
-	      ((:key-down :key-down-event)
-	       (list :key-down-form (rest item)))
-	      ((:key-up :key-up-event)
-	       (list :key-up-form (rest item)))
-	      ((:mouse-move :mouse-motion-event :mouse-motion)
-	       (list :mouse-move-form (rest item)))
-	      ((:mouse-down :mouse-down-event :mouse-button-down-event)
-	       (list :mouse-down-form (rest item)))
-	      ((:mouse-up :mouse-up-event :mouse-button-up-event)
-	       (list :mouse-up-form (rest item)))
-              ((:video-resize-event :video-resize :resize)
-               (list :VIDEO-RESIZE-EVENT (rest item)))
-	      ((:pre-window-init :pre-init)
-	       (list :pre-window-form (rest item)))
-	      ((:time-step :physics :update :update-loop)
-	       (list :timestep-form (rest item)))
-	      ((:post-window-init :post-init :init)
-	       (list :post-window-form (rest item)))))))
+    (collect
+	(case (first item)
+          ((:idle-start :main-start :pre-main :pre-idle)
+           (list :idle-start-form (rest item)))
+	  ((:time-step :game-loop  :update :main :main-loop :idle-loop)
+	   (list :timestep-form (rest item)))
+          ((:pre-draw :pre-auto-draw)
+           (list :pre-auto-draw-form (rest item)))
+          ((:post-draw :post-auto-draw :draw :drawing)
+           (list :post-auto-draw-form (rest item)))
+          ((:draw-ui :ui-draw :ui-event :ui :event-ui)
+           (list :ui-form (rest item)))
+	  ((:window-focus :window-focus-event)
+	   (list :window-focus-form (rest item)))
+	  ((:quit :end :quit-event)
+	   (list :end-form (rest item)))
+	  ((:key-down :key-down-event)
+	   (list :key-down-form (rest item)))
+	  ((:key-up :key-up-event)
+	   (list :key-up-form (rest item)))
+	  ((:mouse-move :mouse-motion-event :mouse-motion)
+	   (list :mouse-move-form (rest item)))
+	  ((:mouse-down :mouse-down-event :mouse-button-down-event)
+	   (list :mouse-down-form (rest item)))
+	  ((:mouse-up :mouse-up-event :mouse-button-up-event)
+	   (list :mouse-up-form (rest item)))
+          ((:video-resize-event :video-resize :resize)
+           (list :VIDEO-RESIZE-EVENT (rest item)))
+	  ((:pre-window-init :pre-init)
+	   (list :pre-window-form (rest item)))
+	  ((:post-window-init :post-init :init)
+	   (list :post-window-form (rest item)))))))
 
 (defun get-event-form (form-key list)
   (cadr (assoc form-key list)))
 
-(defun initialize-font (font)
-  (if (null font)
-      (setf *default-font* (sdl:initialise-font sdl:*ttf-font-vera*))
-      (setf *default-font* font)))
+(defun initialize-font (font-filename font-extention)
+  (setf *default-font*
+        (name (create-font font-filename :file-extention font-extention))))
 
-(defmacro with-window (width height title fps font resizable &body body)
+
+
+(defun set-icon (icon-filename icon-path)
+  (let ((icon (load-bmp icon-filename icon-path)))
+    (sdl-set-icon icon 0)))
+
+(defmacro with-window (width height title fps icon-filename icon-path dt font-filename font-extention resizable &body body)
   `(sdl:with-init ()
      (sdl:init-video)
      (sdl-ttf:init-ttf)
-     (initialize-font ,font)
-     
+     (initialize-font ,font-filename ,font-extention)
+     (when ,icon-filename
+       (set-icon ,icon-filename ,icon-path))
      (sdl:enable-unicode)
-     (sdl:window ,width ,height :title-caption ,title :fps (make-instance 'sdl:fps-mixed :dt 1) :resizable ,resizable)
+     (sdl:window ,width ,height :title-caption ,title :fps (make-instance 'sdl:fps-mixed :dt ,dt)  :resizable ,resizable)
      (setf (sdl:frame-rate) ,fps)
      ,@body))
 
@@ -122,57 +141,78 @@ Create a new asset-path system:
 			   (:sys-wm-event ()
 					  ,@(get-event-form :window-focus-form event-forms))
 			   (:idle ()
+                                  
 				  (sdl:clear-display  (if ,clear-color ,clear-color (get-color black)))
-
+                                  ;;Animation update
+                                  ,@(get-event-form :idle-start-form event-forms)
+                                  
                                   (when (check-state :quit)
                                     (sdl:push-quit-event))
 
                                   (when (check-state :game)
-                                    ;;Animation update
-                                    (update-animations)
                                     
 				    (sdl:with-timestep ()
-				      ,@(get-event-form :timestep-form event-forms))
-
-                                    )
+				      ,@(get-event-form :timestep-form event-forms)
+                                      (update-animations)))
+                                  
+                                  ,@(get-event-form :pre-auto-draw-form event-forms)
                                   
 				  (when ,auto-draw
 				    (dolist (image *auto-draw-list*)
 				      (draw-image image)))
 				  
-				  ,@(get-event-form :main-form event-forms)
-
-				  (sdl:update-display)))
-			 
-			 (sdl-ttf:quit-ttf))
+                                  ,@(get-event-form :post-auto-draw-form event-forms)
+                                  
+                                  ,@(get-event-form :ui-form event-forms)
+                                  
+                                  
+                                  (sdl:update-display))
+			   (sdl-ttf:quit-ttf)))
+         ;; Cleanup
 	 (setf *images* (make-array 0 :adjustable t :fill-pointer 0)
-	       *auto-draw-list* nil)))))
+	       *auto-draw-list* nil
+               *fonts* nil
+               *animated-sprites-to-animate* nil)))))
 
 (defmacro start ((&key width height (title "working title") (fps 60)
-		    default-font
+		    (default-font "vera")
+                    (default-font-extention "ttf")
                     resizable
+                    (dt 10)
 		    (auto-draw t)
                     (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) ""))
+                    (font-path asset-path)
+                    (icon-filename)
+                    (icon-path asset-path)
 		    clear-color) &rest body)
   "Arguments:
 :width (integer): Width of the window.
 :height (integer): Height of the window.
 :title (string): Title of the window.
 :fps (integer): Frames per second the window should run at.
-:default-font (string or Pathname to file): Font to use as the base-font.
+:icon (string) : Filename of icon (must be an bmp file)
+:default-font (string or Pathname): filename (without the extention) of the font that will be default. Defaults to [vera]
+:default-font-extention (string or pathname) : The extention for the font-file (without '.'), defaults to [ttf].
 :resizable (boolean): Whether the window can be resized or not.
 :auto-draw (boolean): Automatically draw loaded images or animations.
-:asset-path (String or Pathname): Default path to look for any/all assets.
+:asset-path (String or Pathname): Default path to look for any files. - Default is your-package
+:font-path (string or pathname): Default path to look for font files. Will default to asset-path if not set.
+:icon-filename (string) : filename without extention of the window-icon you want. Note: File must be an [BMP] file.
+:icon-path (string or pathname) : path to where the icon-file is. Defaults to asset-path
 :clear-color (SDL:Color): Base color used to reset the window."
   (unwind-protect (progn
 		    (let ((event-forms (filter-events body)))
 		      `(progn 
 			 ,@(get-event-form :pre-window-form event-forms)
-			 (init-globals ,width ,height ,asset-path)
-			 (with-window ,width ,height ,title ,fps ,default-font ,resizable
+			 (init-globals ,width ,height ,asset-path ,font-path)
+			 (with-window ,width ,height ,title ,fps ,icon-filename ,icon-path ,dt ,default-font ,default-font-extention ,resizable
 			   ,@(get-event-form :post-window-form event-forms)
 			   (with-events ,event-forms ,clear-color ,auto-draw)))))))
 
-;; redo asset path when making executable
+
+
+;;; Create the ability to compile into an executable easily.
+;;; Sets the asset and font-path to relative to the .executable
+;;; Transfer all .DLL\Fonts and save the executable to an bin folder.
 (defun make-executable ()
   "create an executable for current game/project")

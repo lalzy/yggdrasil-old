@@ -8,7 +8,8 @@
 
    :*width*
    :*height*
-   
+
+   :pos
    :rectangle
    :circle
 
@@ -65,6 +66,7 @@
    #:update-animations
    #:is-animation-playing?
    #:flip-animation
+   #:pause-animation
    
    ;;; Drawing-Helper
    #:allocate-cells

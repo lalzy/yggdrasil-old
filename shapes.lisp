@@ -1,19 +1,21 @@
 ;;;; shapes.lisp
 ;;;; Handles representation of shapes, classes, getters and drawing.
 (in-package :yggdrasil)
+;;; Clean up the w\h\r methods so that they don't overwrite the accessor, should only compliment them.
+
 
 (defclass pos () ;; Exists to abstract away SDL for when\if i move over to openGL
-  ((x :initarg :x)
-   (y :initarg :Y))
+  ((x :initarg :x :accessor x)
+   (y :initarg :Y :accessor y))
   (:documentation "class for x\y positioning of objects used by the engine"))
 
 (defclass circle (pos) ;; Exists to abstract away SDL for when\if i move over to openGL
-  ((radius :initarg :r))
+  ((radius :initarg :r :accessor r))
   (:documentation "primitive circle-shape used by the engine.")) 
 
 (defclass rectangle (pos) ;; Exists to abstract away SDL for when\if i move over to openGL
-  ((width :initarg :w)
-   (height :initarg :h))
+  ((width :initarg :w :accessor w)
+   (height :initarg :h :accessor h))
   (:documentation "primitive rectangle-shape used by the engine."))
 
 (defgeneric x (object)
@@ -22,14 +24,8 @@
 (defmethod x ((object array))
   (aref object 0))
 
-(defmethod x ((object pos))
-  (slot-value object 'x))
-
 (defmethod (setf x) (value (object array))
   (setf (aref object 0) value))
-
-(defmethod (setf x) (value (object pos))
-  (setf (slot-value object 'x) value))
 
 (defgeneric y (object)
   (:documentation "getter\setter for y-position, either as vector or as pos object"))
@@ -37,14 +33,8 @@
 (defmethod y ((object array))
   (aref object 1))
 
-(defmethod y ((object pos))
-  (slot-value object 'y))
-
 (defmethod (setf y) (value (object array))
   (setf (aref object 1) value))
-
-(defmethod (setf y) (value (object pos))
-  (setf (slot-value object 'y) value))
 
 (defgeneric w (object)
   (:documentation "getter for rectangle width, either as vector or as rectangle object"))
