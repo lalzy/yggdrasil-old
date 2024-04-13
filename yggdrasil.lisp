@@ -1,8 +1,11 @@
 (in-package #:yggdrasil)
 
 #||
+Fix up\write documentation where it's missing.
 
 Fix\improve error-handling (error-messages when failing to create images, fonts, etc)
+
+Fix image-flipping to work horizontally.
 
 Option for automatic-click interaction on drawn shapes\images
 

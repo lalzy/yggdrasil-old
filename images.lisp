@@ -4,11 +4,17 @@
 
 
 (defclass image (rectangle)
-  ((image-name :initarg :name :accessor name)
-   (image-data :initarg :image :accessor image-data)
-   (sprite-cells :initarg :cells :accessor cell-list)
-   (flipped :initform nil :accessor flipped)
-   (cell-count :initarg :cell-count :accessor cell-count)))
+  ((image-name :initarg :name :accessor name
+               :documentation "Name for this image, used in auto-drawing")
+   (image-data :initarg :image :accessor image-data
+               :documentation "The SDL image data") ;With openGL, this will become pixel-data
+   (sprite-cells :initarg :cells :accessor cell-list
+                 :documentation "Cell-list for the image")
+   (flipped :initform nil :accessor flipped
+            :documentation "wether the image has been flipped or not")
+   (cell-count :initarg :cell-count :accessor cell-count
+               :documentation "Amount of cells the image has"))
+  (:documentation ""))
 
 
 (defun allocate-cells (width height by-x by-y)

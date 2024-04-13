@@ -3,7 +3,7 @@
 (asdf:defsystem #:yggdrasil
   :description "Describe yggdrasil here"
   :author "S.K.N. The Lisper"
-  :license  "Specify license here"
+  :license  "BSD3"
   :version "0.0.1"
   :serial t
   :depends-on (#:lispbuilder-sdl #:lispbuilder-sdl-image  #:lispbuilder-sdl-gfx #:lispbuilder-sdl-ttf

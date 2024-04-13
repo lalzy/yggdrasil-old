@@ -5,10 +5,13 @@
 (defparameter *default-font-size* 14) ; Default size when no size is specified at font-creation
 
 (defclass font ()
-  ((fonts :initarg :fonts :accessor fonts) ; vector holding all the fonts keyed list containing fonts and size.
-   (name :initarg :name :accessor name) ; Font's file-name. Used both to access the file, and access the actual font
-   (default-size :initarg :default-size :accessor default-size)) ; 
-  (:documentation ""))
+  ((fonts :initarg :fonts :accessor fonts
+          :documentation "vector holding all the fonts in an AList[size.font-object]") 
+   (name :initarg :name :accessor name
+         :documentation "the filename of the font without extention")
+   (default-size :initarg :default-size :accessor default-size
+                 :documentation "the size that will be drawn by default when calling the font and not specifying a size"))
+  (:documentation "test"))
 
 (defun create-font-helper-loop (sizes file)
   (loop :for size :in sizes
@@ -67,27 +70,6 @@ size = the size of the font"
   (unless (get-font font size)
     (error (format nil "font ~a does not exist" font)))
   (sdl:draw-string-solid-* string x y :color (get-color white) :font (get-font font size)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;; to unify making a font for when we go to OpenGL
-(defun make-font (font-name &key (file-path "") (size 15))
-  (sdl:initialise-font
-   (make-instance 'sdl:ttf-font-definition :size size :filename (merge-pathnames font-name file-path))))
 
 
 (defun text-size (string &optional (font *default-font*))
