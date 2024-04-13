@@ -19,8 +19,8 @@ Very quick and simple example of how to use the engine to draw an solid coloured
 	   	(decf w 5)
      		(decf h 5))))
        (:draw
-         (yg:draw-rectangle (vector (- (round width 2) (round w 2)) (- (round height 2) (round h 2))
-	                             w h :color (yg:get-color green) :filled t))))))
+         (yg:draw-rectangle (vector (- (round width 2) (round w 2)) (- (round height 2) (round h 2)) w h)
+                            :color (yg:get-color green) :filled t)))))
 ```
 
 Examples for how to use the various components for the engine can be found in the examples folders. You can call the examples by calling `(ql:quickload :yggdrasil-examples)` then call the individual examples. Like so: `(animated-sprites:main)`
