@@ -1,13 +1,9 @@
 (in-package #:yggdrasil)
 
 #||
-Fix drawing bug!!
-    > Rectangle and circle does not draw filled!!
-
-
 Fix up\write documentation where it's missing.
 
-Fix\improve error-handling (error-messages when failing to create images, fonts, etc)
+When attempting to create a font that already exist, overwrite it instead.
 
 Fix image-flipping to work horizontally.
 
@@ -22,6 +18,9 @@ Create a new asset-path system:
     > Images
     > Fonts
     > Sounds
+
+Create possibility to compile:
+   Paths should become relative to executable.
 
 replace loop with iter(?)
 
@@ -114,8 +113,8 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 
 (defmacro with-events (event-forms clear-color auto-draw)
   "The SDL-Event chain"
-  (alexandria:with-gensyms (previous-mouse-x previous-mouse-y position-variable)
-    `(let ((,previous-mouse-x 0) (,previous-mouse-y 0) ,position-variable)
+  (alexandria:with-gensyms (previous-mouse-x previous-mouse-y) ; Used to have position-variable, unsure what it was intended for, had no use and was removed
+    `(let ((,previous-mouse-x 0) (,previous-mouse-y 0))
        (unwind-protect (progn
 			 (sdl:with-events ()
 			   (:quit-event () ,@(get-event-form :end-form event-forms) t)
@@ -127,7 +126,7 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 								    (filter-special-keys key)))
 						      *keys-pressed*)))
 					    ,@(get-event-form :key-down-form event-forms))
-			   (:key-up-event (:unicode unicode)
+			   (:key-up-event ()
 					  (setf *keys-pressed* (remove-key-states))
 					  ,@(get-event-form :key-up-form event-forms))
 			   (:mouse-motion-event (:x x :y y)
@@ -179,7 +178,8 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
                                   
                                   (sdl:update-display))
 			   (sdl-ttf:quit-ttf)))
-         ;; Cleanup
+         
+         ;;; Cleanup section
 	 (setf *images* (make-array 0 :adjustable t :fill-pointer 0)
 	       *auto-draw-list* nil
                *fonts* nil

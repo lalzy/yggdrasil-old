@@ -3,7 +3,6 @@
 (in-package :yggdrasil)
 ;;; Clean up the w\h\r methods so that they don't overwrite the accessor, should only compliment them.
 
-
 (defclass pos () ;; Exists to abstract away SDL for when\if i move over to openGL
   ((x :initarg :x :accessor x)
    (y :initarg :Y :accessor y))

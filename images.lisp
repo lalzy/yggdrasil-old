@@ -43,12 +43,14 @@ Size-x\y = where the pixles will separate the cells"
   (push (find-image image-name) *auto-draw-list*))
 
 (defun load-image (filename &key (path *asset-path*) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw sprite-cells)
-  (let* ((arguments `(,(merge-pathnames filename path)
-		    ,@(when color-key (list :color-key color-key))
-		    ,@(when color-key-at (list :color-key-at color-key-at))
-		     :alpha ,alpha))
+  (let* ((arguments `(,(create-file-path filename path)
+		      ,@(when color-key (list :color-key color-key))
+		      ,@(when color-key-at (list :color-key-at color-key-at))
+		      :alpha ,alpha))
 	 (surface (apply #'sdl:load-and-convert-image arguments))
-	 (image (make-instance 'image :name image-name :image surface :w (sdl:width surface) :h (sdl:height surface) :x x :y y :cells sprite-cells :cell-count (length sprite-cells))))
+	 (image (make-instance 'image :name image-name :image surface
+                                      :w (sdl:width surface) :h (sdl:height surface)
+                                      :x x :y y :cells sprite-cells :cell-count (length sprite-cells))))
     (vector-push-extend image *images*)
 
     (when sprite-cells
@@ -57,7 +59,6 @@ Size-x\y = where the pixles will separate the cells"
     (when auto-draw
       (push image *auto-draw-list*))
     image))
-
 
 (defun draw-image-with-name (image-name &key x y)
   (let ((arguments
@@ -86,9 +87,11 @@ vertical - flips it vertically"
     (setf (image-data image) flipped-image)))
 
 ;; Reduntant in SDL, not reduntant with OpenGL whenever I transition
-(defun draw-image (image &key (x (x image)) (y (y image)) cell)
+(defun draw-image (image &key x y cell)
   ;; Ensure image cordinates is always same as drawn cordinates
-  (unless (and image (edge-collision-check image t))
-    (setf (x image) x
-          (y image) y)
-    (sdl:draw-surface-at-* (image-data image) x y :cell cell)))
+  (cond ((typep image 'image)
+         (unless (and image (edge-collision-check image t))
+           (sdl:draw-surface-at-* (image-data image) (if x x (x image)) (if y y (y image)) :cell cell)))
+        ((null image)
+         (error (format nil "passed variable is empty. You need to provide an image-object")))
+        (t (error (format nil "~a is not of type image. You need an yggdrasil:image object" image)))))

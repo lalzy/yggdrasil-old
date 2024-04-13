@@ -81,7 +81,7 @@
    #:menu-draw
    
    ;;; Text
-   #:Make-font
+   #:create-font
    #:draw-string
    #:draw-string-*
 

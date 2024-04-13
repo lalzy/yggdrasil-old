@@ -1,5 +1,8 @@
 (in-package :yggdrasil)
 
+(defmacro sbreak (string &rest arguments)
+  `(break (format nil ,string ,@arguments)))
+
 (defun length-1 (sequence)
   "Returns one less than the length of the sequence."
   (1- (length sequence)))
@@ -12,14 +15,19 @@
                         (string argument)
                         argument)
                     symbol))
+(defun filter-extention ())
 
 ;;; File handling
 (defun create-filename (filename file-extention)
   (format nil "~a.~a" filename file-extention))
 
-(defun create-file-path (filename file-path file-extention)
-  (or (probe-file (merge-pathnames (create-filename filename file-extention) file-path))
-      (error (format nil "file: [~a.~a] in [~a] does not exist" filename file-extention file-path))))
+(defun pathname-error-check (variable)
+  (or (typep variable 'string) (typep variable 'pathname) (error (format nil "~a is not a string, or pathname"  variable))))
+
+(defun create-file-path (filename file-path &optional file-extention)
+  (when (and (pathname-error-check file-path) (pathname-error-check filename) t)
+    (or (probe-file (merge-pathnames (if file-extention (create-filename filename file-extention) filename) file-path))
+        (error (format nil "file: [~a~a] in [~a] does not exist" filename (if file-extention (uiop:strcat "." file-extention) "") file-path)))))
 
 (defun verify-file (file path extention)
   "Verifies that the file exist"
