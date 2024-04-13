@@ -4,7 +4,7 @@ Simply put, it's a simple 2D engine built atop of Lispbuilder-sdl(SDL 1.2). Lisp
 
 Currently the engine does, simple startup of SDL through one macro(start). Allow for easy event calls. Checking which key is being pressed(through passing the char) and easy access to colors(through a pre-setup color list that can be added to during runtime), simple example showcasing this:
 
-(defun main (&aux (width 640) (height 480))
+`(defun main (&aux (width 640) (height 480))
   (let ((w 50) (h 50))
     (yg:start
 	(:width width :height height)
@@ -22,7 +22,7 @@ Currently the engine does, simple startup of SDL through one macro(start). Allow
 	 (sdl:draw-box-* (- (round width 2) (round w 2)) (- (round height 2) (round h 2)) w h :color (yg:get-color green)))
 	
 	(:end (format t "bye!~%")))))
-
+`
 Numerous places to interject code includes, pre\post window initialization, all the event loops of SDL(including quit event) and a post-sql shutdown.
 
 
