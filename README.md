@@ -2,37 +2,32 @@
 
 Simply put, it's a simple 2D engine built atop of Lispbuilder-sdl(SDL 1.2). Lispbuilder-sdl was chosen as SDL2-ttf is too outdated and can't be used with modern SDL2.
 
-Currently the engine does, simple startup of SDL through one macro(start). Allow for easy event calls. Checking which key is being pressed(through passing the char) and easy access to colors(through a pre-setup color list that can be added to during runtime), simple example showcasing this:
+The aim for the engine is to abstract away from SDL, and generally 'low-level' calls, and instead automate as much as can be automated (like sprites, collisions, etc).
 
-`(defun main (&aux (width 640) (height 480))
+Very quick and simple example of how to use the engine to draw an solid coloured rectangle:
+```
+(defun main (&aux (width 640) (height 480))
   (let ((w 50) (h 50))
     (yg:start
-	(:width width :height height)
-
-	(:key-down
-	 (cond ((yg:is-key #\+)
+      (:width width :height height
+		:font-path (asdf:system-relative-pathname :lispbuilder-sdl "assets/")) ; necessary due to how font system work, you can't have an empty font
+      (:key-down 
+        (cond ((yg:is-key #\+)
 		(incf w 5)
-		(incf h 5))
-	       
-	       ((yg:is-key #\-)
-		(decf w 5)
-		(decf h 5))))
-	
-	(:main
-	 (sdl:draw-box-* (- (round width 2) (round w 2)) (- (round height 2) (round h 2)) w h :color (yg:get-color green)))
-	
-	(:end (format t "bye!~%")))))`
-Numerous places to interject code includes, pre\post window initialization, all the event loops of SDL(including quit event) and a post-sql shutdown.
+  		(incf h 5))
+    	      ((yg:is-key #\-)
+	   	(decf w 5)
+     		(decf h 5))))
+       (:draw
+         (yg:draw-rectangle (vector (- (round width 2) (round w 2)) (- (round height 2) (round h 2))
+	                             w h :color (yg:get-color green) :filled t))))))
+```
+
+Examples for how to use the various components for the engine can be found in the examples folders. You can call the examples by calling `(ql:quickload :yggdrasil-examples)` then call the individual examples. Like so: `(animated-sprites:main)`
 
 
 The current plans for the engine are in no particular order:
-
-OpenGL for graphics\drawing(which is why there's a lot of redundancies, like shape objects, X\Y cordinates for them, etc, SDL's surface system dissapears with OpenGL for obvious reasons, thereby so do they).
-GUI stuff(Scrollbars, TextFields, Windows, buttons, etc, etc).
-Collision for objects(primarily circles and rectangles, maybe other shapes at a later date). 
-Rotation of objects and collision for said rotated objects.
-Simple Physics.
-Potentionally replace SDLs audio library with something like OpenAL.
-
-
-Originally the engine was just a few helper functions \ macros to streamline the use of SDL to avoid having to redo the exact same things over and over, but as the scope increased, it become more like an simple\small engine, than just helper functions, and so a full fledged engine it is now instead.
+An UI system (scrollbars, textfields, window-frames, buttons, etc).
+Proper collisions, and\or physics engine (probably tied to Box2D)
+Object-rotation (semi-implemented) + collision for said rotated objects
+OpenGL for rendering (definitely no ETA, everything is designed so that if using the engine, when this switch happens it won't affect anything made with the engine)
