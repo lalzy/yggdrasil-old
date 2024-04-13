@@ -1,6 +1,10 @@
 (in-package #:yggdrasil)
 
 #||
+Fix drawing bug!!
+    > Rectangle and circle does not draw filled!!
+
+
 Fix up\write documentation where it's missing.
 
 Fix\improve error-handling (error-messages when failing to create images, fonts, etc)
@@ -20,6 +24,8 @@ Create a new asset-path system:
     > Sounds
 
 replace loop with iter(?)
+
+Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw functionalities (when re-implemented properly) 
 ||#
 
 
