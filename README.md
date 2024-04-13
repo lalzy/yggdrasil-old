@@ -21,8 +21,7 @@ Currently the engine does, simple startup of SDL through one macro(start). Allow
 	(:main
 	 (sdl:draw-box-* (- (round width 2) (round w 2)) (- (round height 2) (round h 2)) w h :color (yg:get-color green)))
 	
-	(:end (format t "bye!~%")))))
-`
+	(:end (format t "bye!~%")))))`
 Numerous places to interject code includes, pre\post window initialization, all the event loops of SDL(including quit event) and a post-sql shutdown.
 
 
