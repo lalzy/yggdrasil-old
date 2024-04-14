@@ -83,7 +83,7 @@ vertical - flips it vertically"
       (setf (sdl:cells flipped-image) (if (flipped image)
                                           (reverse (cell-list image))
                                           (cell-list image))))
-    
+    (sdl:free (image-data image)) ;; Clean up old image before we set new one
     (setf (image-data image) flipped-image)))
 
 ;; Reduntant in SDL, not reduntant with OpenGL whenever I transition
