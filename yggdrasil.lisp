@@ -1,6 +1,9 @@
 (in-package #:yggdrasil)
 
 #||
+Fix memory-leak with create-surface (affects all drawings, especially flipping image)
+
+
 Fix up\write documentation where it's missing.
 
 When attempting to create a font that already exist, overwrite it instead.
@@ -27,6 +30,7 @@ replace loop with iter(?)
 Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw functionalities (when re-implemented properly) 
 ||#
 
+(declaim (optimize (speed 3)))
 
 (defparameter *width* nil)
 (defparameter *height* nil)

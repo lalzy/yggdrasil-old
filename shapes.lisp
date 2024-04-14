@@ -88,7 +88,7 @@
     (declare (type fixnum w h *width* *height*
                    w-sum h-sum))
     
-    (vector x y (round w-sum) (round h-sum))))
+    (vector x y (round w-sum) (round h-sum)))))
  ; (vector x y (round (%-of-value w *width*)) (round (%-of-value h *height*)))))
 
 (defun create-rectangle-object-* (x y w h))
