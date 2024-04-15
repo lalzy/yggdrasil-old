@@ -13,6 +13,9 @@
    :rectangle
    :circle
 
+   #:set-path
+   #:get-path
+   
    #:get-aspectratio
 
    ;;; State

@@ -122,7 +122,7 @@
              ;;; So anything drawn here, will appear infront. Intended primarily for UI elements.
              (:draw-ui
               (yg:draw-string 0 0 "press space to pause/unpause, press f\g to increase\decrease fps")
-              (yg:draw-string 0 30 (format nil "FPS = ~a, timescale = ~a" (truncate (sdl:average-fps))  (sdl:time-scale)))
+              (yg:draw-string 0 30 (format nil "FPS = ~a, timescale = ~a" (truncate (sdl:average-fps))  (float (sdl:time-scale))))
               (yg:with-state :menu
                 (yg:draw-string 150 50 "Paused")))))
        ;;cleanup

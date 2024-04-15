@@ -20,7 +20,10 @@
                     (make-instance 'sdl:ttf-font-definition :size size :filename file)))))
 
 
-(defun create-font (font-name &key (default-size *default-font-size*) (file-path *font-path*) (file-extention "ttf") (sizes (loop :for i :from 6 :to 100 :collect i)))
+(defun create-font (font-name &key (default-size *default-font-size*)
+                                (file-path (get-path font))
+                                ;(file-path *font-path*)
+                                (file-extention "ttf") (sizes (loop :for i :from 6 :to 100 :collect i)))
   "Font-name = name of the font-file name, without extention
 File-path = path to the font-file without the name
 file-extention = the file's extention without '.'

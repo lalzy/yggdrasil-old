@@ -15,6 +15,10 @@
 			     (purple ,(sdl:color :r 128 :g 0 :b 128))
 			     (yellow ,(sdl:color :r 255 :g 255 :b 0))))
 
+;; Reduntant with SDL, not reduntant for OpenGL
+(defun get-rgb-color (&key (r 0) (g 0) (b 0))
+  (sdl:color :r r :g g :b b))
+
 ;; must be rewritten for OpenGL
 (defun set-color (color-symbol &key (r 0) (g 0) (b 0))
   (push (list color-symbol (sdl:color :r r :g g :b b)) *sdl-colors*))
@@ -25,3 +29,4 @@
 
 (defmacro get-color (color)
   `(find-color ',color))
+

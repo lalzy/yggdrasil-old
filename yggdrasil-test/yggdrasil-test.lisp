@@ -23,13 +23,16 @@
    (lambda ()
      (let (image)
        (yg:start
-           (:width width :height height :title title :icon-filename "lisp" 
+        (:width 200 :height 200 :title "title" ; :icon-filename "lisp" 
             :asset-path *asset-path*)
-           (:init (setf image (yg:load-image "lisp.bmp" :x 150
-                                                        :y 150)))
+           ;(:init ;(setf image (yg:load-image "lisp.bmp" :x 150
+                  ;                                      :y 150))
+                  ;)
            (:draw
-            (yg:draw-image image)
-            (yg:draw-string 0 0 "default") 
-            (yg:draw-string 0 50 "testing-new-font" :size 6)
-            (yg:draw-string 0 100 "testing-new-font2" :size 80)))))
+            (yg:draw-rectangle #(50 50 50 50) :filled t)
+            ;(yg:draw-image image)
+           ; (yg:draw-string 0 0 "default") 
+            ;(yg:draw-string 0 50 "testing-new-font" :size 6)
+                                        ;(yg:draw-string 0 100 "testing-new-font2" :size 80)
+            ))))
    :name title))

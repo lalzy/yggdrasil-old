@@ -1,8 +1,7 @@
 (in-package #:yggdrasil)
 
 #||
-Fix memory-leak with create-surface (affects all drawings, especially flipping image)
-
+Replace all references to old asset-paths, with the new asset-paths system (get-path -pathtype-)
 
 Fix up\write documentation where it's missing.
 
@@ -13,14 +12,6 @@ Fix image-flipping to work horizontally.
 Option for automatic-click interaction on drawn shapes\images
 
 Create an UI-System
-
-Create a new asset-path system:
-  Asset-path = root-path for assets
-  Functions to overwrite\append to asset-path root
-  Separate paths for separated assets based on root.
-    > Images
-    > Fonts
-    > Sounds
 
 Create possibility to compile:
    Paths should become relative to executable.
@@ -37,12 +28,17 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 (defparameter *asset-path* nil)
 (defparameter *font-path* nil)
 
+(defun init-paths (asset-path font-path image-path)
+  (set-path root asset-path)
+  (set-path font font-path)
+  (set-path image image-path))
 
-(defun init-globals (width height asset-path font-path)
+(defun init-globals (width height asset-path font-path image-path)
+  (init-paths asset-path font-path image-path)
   (setf *width* width
 	*height* height
-	*asset-path* asset-path
-        *font-path* font-path))
+	*asset-path* asset-path ; To be removed
+        *font-path* font-path)) ; to be removed
 
 (defun filter-events (body)
   "Filters out the synonymous keywords into a unified keyword"
@@ -196,7 +192,8 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
                     (dt 10)
 		    (auto-draw t)
                     (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) ""))
-                    (font-path asset-path)
+                    (font-path "")
+                    (image-path "")
                     (icon-filename)
                     (icon-path asset-path)
 		    clear-color) &rest body)
@@ -219,7 +216,7 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 		    (let ((event-forms (filter-events body)))
 		      `(progn 
 			 ,@(get-event-form :pre-window-form event-forms)
-			 (init-globals ,width ,height ,asset-path ,font-path)
+			 (init-globals ,width ,height ,asset-path ,font-path ,image-path)
 			 (with-window ,width ,height ,title ,fps ,icon-filename ,icon-path ,dt ,default-font ,default-font-extention ,resizable
 			   ,@(get-event-form :post-window-form event-forms)
 			   (with-events ,event-forms ,clear-color ,auto-draw)))))))
