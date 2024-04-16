@@ -10,7 +10,6 @@ Very quick and simple example of how to use the engine to draw an solid coloured
   (let ((w 50) (h 50))
     (yg:start
       (:width width :height height
-		:font-path (asdf:system-relative-pathname :lispbuilder-sdl "assets/")) ; necessary due to how font system work, you can't have an empty font
       (:key-down 
         (cond ((yg:is-key #\+)
 		(incf w 5)
@@ -28,8 +27,12 @@ Examples for how to use the various components for the engine can be found in th
 
 The current plans for the engine are in no particular order:
 
+multi-res \ Aspect-Ratio support by default for anything drawn.
+Save-system
+Ability to read tile-maps
 Proper error-handling (Message-Box when compiled) that works for both Windows and Linux.
 An UI system (scrollbars, textfields, window-frames, buttons, etc).
 Proper collisions, and\or physics engine (probably tied to Box2D)
 Object-rotation (semi-implemented) + collision for said rotated objects
 OpenGL for rendering (definitely no ETA, everything is designed so that if using the engine, when this switch happens it won't affect anything made with the engine)
+Better sound-system (third-party sound-library, openAl?)

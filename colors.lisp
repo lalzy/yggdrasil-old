@@ -15,9 +15,31 @@
 			     (purple ,(sdl:color :r 128 :g 0 :b 128))
 			     (yellow ,(sdl:color :r 255 :g 255 :b 0))))
 
-;; Reduntant with SDL, not reduntant for OpenGL
-(defun get-rgb-color (&key (r 0) (g 0) (b 0))
+(defun color-error (color)
+      (error "argument:[~a] of type:[~a] is not a valid sequence for color! must be 3 numbers valued between 0 - 255" color (type-of color))
+
+(defun filter-color-sequence-helper (r g b)
   (sdl:color :r r :g g :b b))
+
+(defmethod filter-color (color)
+  (color-error color))
+
+(defmethod filter-color ((color sdl:color))
+  color)
+
+(defgeneric filter-color (color)
+  "Ensures that whatever is passed is a valid color to be used for drawing.
+Color must be either an SDL-object (as created by (yg:get-color)), or a sequence of 3 numbers between 0 - 255")
+
+(defmethod filter-color ((color list))
+  (if (typep color 'valid-color)
+      (filter-color-sequence-helper (first color) (second color) (third color))
+      (color-error color)))
+
+(defmethod filter-color ((color vector))
+  (if (typep color 'valid-color)
+      (filter-color-sequence-helper (aref color 0) (aref color 1) (aref color 2))
+      (color-error color)))
 
 ;; must be rewritten for OpenGL
 (defun set-color (color-symbol &key (r 0) (g 0) (b 0))

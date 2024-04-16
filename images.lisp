@@ -42,7 +42,7 @@ Size-x\y = where the pixles will separate the cells"
 (defun add-to-auto-draw (image-name)
   (push (find-image image-name) *auto-draw-list*))
 
-(defun load-image (filename &key (path *asset-path*) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw sprite-cells)
+(defun load-image (filename &key (path (get-path image)) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw sprite-cells)
   (let* ((arguments `(,(create-file-path filename path)
 		      ,@(when color-key (list :color-key color-key))
 		      ,@(when color-key-at (list :color-key-at color-key-at))

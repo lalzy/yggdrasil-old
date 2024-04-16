@@ -1,11 +1,10 @@
 (in-package #:yggdrasil)
 
 #||
-Replace all references to old asset-paths, with the new asset-paths system (get-path -pathtype-)
+Fix up\recheck color-key'ing with draw-image\animation.
+    > Use (color-filter) with color-key
 
 Fix up\write documentation where it's missing.
-
-When attempting to create a font that already exist, overwrite it instead.
 
 Fix image-flipping to work horizontally.
 
@@ -25,8 +24,6 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 
 (defparameter *width* nil)
 (defparameter *height* nil)
-(defparameter *asset-path* nil)
-(defparameter *font-path* nil)
 
 (defun init-paths (asset-path font-path image-path)
   (set-path root asset-path)
@@ -36,9 +33,7 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 (defun init-globals (width height asset-path font-path image-path)
   (init-paths asset-path font-path image-path)
   (setf *width* width
-	*height* height
-	*asset-path* asset-path ; To be removed
-        *font-path* font-path)) ; to be removed
+	*height* height)) ; to be removed
 
 (defun filter-events (body)
   "Filters out the synonymous keywords into a unified keyword"
@@ -81,8 +76,10 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 
 (defun initialize-font (font-filename font-extention)
   (setf *default-font*
-        (name (create-font font-filename :file-extention font-extention))))
-
+        (handler-case 
+            (name (create-font font-filename :file-extention font-extention))
+          (error ()
+            nil))))
 
 
 (defun set-icon (icon-filename icon-path)
@@ -152,7 +149,7 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 					  ,@(get-event-form :window-focus-form event-forms))
 			   (:idle ()
                                   
-				  (sdl:clear-display  (if ,clear-color ,clear-color (get-color black)))
+				  (sdl:clear-display  (if ,clear-color (filter-color ,clear-color) (get-color black)))
                                   ;;Animation update
                                   ,@(get-event-form :idle-start-form event-forms)
                                   

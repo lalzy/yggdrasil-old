@@ -13,7 +13,7 @@
    (animation-counter :initform 0 :accessor animation-counter))
   (:documentation ""))
 
-(defun create-animated-sprite (filename sprite-cells &key (path *asset-path*) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw
+(defun create-animated-sprite (filename sprite-cells &key (path (get-path image)) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw
                                                        (interval 5) start-playing)
   (let ((animated-sprite (make-instance 'animation-set :sprite (load-image filename :path path :x x :y y :color-key color-key :color-key-at color-key-at :alpha alpha :image-name image-name :auto-draw auto-draw :sprite-cells sprite-cells) :interval interval)))
     (when start-playing

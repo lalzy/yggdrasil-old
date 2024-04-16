@@ -15,28 +15,12 @@
                         (string argument)
                         argument)
                     symbol))
-(defun filter-extention ())
-
-;;; File handling
-(defun create-filename (filename file-extention)
-  (format nil "~a.~a" filename file-extention))
-
-(defun pathname-error-check (variable)
-  (or (typep variable 'string) (typep variable 'pathname) (error (format nil "~a is not a string, or pathname"  variable))))
-
-(defun create-file-path (filename file-path &optional file-extention)
-  (when (and (pathname-error-check file-path) (pathname-error-check filename) t)
-    (or (probe-file (merge-pathnames (if file-extention (create-filename filename file-extention) filename) file-path))
-        (error (format nil "file: [~a~a] in [~a] does not exist" filename (if file-extention (uiop:strcat "." file-extention) "") file-path)))))
-
-(defun verify-file (file path extention)
-  "Verifies that the file exist"
-  (or (namestring (uiop:probe-file* (create-file-path file path extention))) (error "[~a.~a] does not exist in ~a" file extention path)))
 
 ;;
 (defun get-aspectratio ()
   (/ *height* *width*))
 
+;; Rename to dovector
 ;; TOdo mirror dolist's functionalities
 (defmacro doarray ((name vector) &body body)
   `(let (,name)

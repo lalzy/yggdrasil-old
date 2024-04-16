@@ -105,7 +105,7 @@
 
 (defun draw-line-* (x-start y-start x-end y-end &key (color (get-color white)))
   "helper to draw-line, takes absolute values instead of vector\object"
-  (sdl:draw-line-* x-start y-start x-end y-end :color color))
+  (sdl:draw-line-* x-start y-start x-end y-end :color (filter-color color)))
 
 (defun draw-line (point1 point2 &key (color (get-color white)))
   "draws a line from point1 to point2. Points are either vectors, or pos-objects.
@@ -130,8 +130,8 @@ color - takes an (SDL) color (default white)"
                        y (- y (round (/ h 2)))))
                
                (if filled
-	           (sdl:draw-box-* 0 0 w h :color color :surface surface)
-	           (sdl:draw-rectangle-* 0 0 w h :color color :surface surface))
+	           (sdl:draw-box-* 0 0 w h :color (filter-color color) :surface surface)
+	           (sdl:draw-rectangle-* 0 0 w h :color (filter-color color) :surface surface))
 
                ;; prevents miss-alignment with 'straight' angles.
                (when (and (> angle 0) (/= angle 90) (/= angle 180) (/ angle 360))
@@ -174,8 +174,8 @@ angle - Angle to draw\rotate the rectangle (default 0)"
 	       (sdl:draw-box-* 0 0 size size :color color-key :surface surface)
 	       (if filled
 	           (sdl:draw-filled-circle-* r r r
-				             :color color :surface surface)
-	           (sdl:draw-circle-* r r r :color color :surface surface))
+				             :color (filter-color color) :surface surface)
+	           (sdl:draw-circle-* r r r :color (filter-color color) :surface surface))
 	       (sdl:draw-surface-at-* surface x y))
           (sdl:free surface)))))
   
