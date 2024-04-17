@@ -16,7 +16,7 @@
 			     (yellow ,(sdl:color :r 255 :g 255 :b 0))))
 
 (defun color-error (color)
-      (error "argument:[~a] of type:[~a] is not a valid sequence for color! must be 3 numbers valued between 0 - 255" color (type-of color))
+      (error "argument:[~a] of type:[~a] is not a valid sequence for color! must be 3 numbers valued between 0 - 255" color (type-of color)))
 
 (defun filter-color-sequence-helper (r g b)
   (sdl:color :r r :g g :b b))
@@ -28,8 +28,8 @@
   color)
 
 (defgeneric filter-color (color)
-  "Ensures that whatever is passed is a valid color to be used for drawing.
-Color must be either an SDL-object (as created by (yg:get-color)), or a sequence of 3 numbers between 0 - 255")
+  (:documentation "Ensures that whatever is passed is a valid color to be used for drawing.
+Color must be either an SDL-object (as created by (yg:get-color)), or a sequence of 3 numbers between 0 - 255"))
 
 (defmethod filter-color ((color list))
   (if (typep color 'valid-color)

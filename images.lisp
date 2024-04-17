@@ -44,7 +44,7 @@ Size-x\y = where the pixles will separate the cells"
 
 (defun load-image (filename &key (path (get-path image)) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw sprite-cells)
   (let* ((arguments `(,(create-file-path filename path)
-		      ,@(when color-key (list :color-key color-key))
+		      ,@(when color-key (list :color-key (filter-color color-key)))
 		      ,@(when color-key-at (list :color-key-at color-key-at))
 		      :alpha ,alpha))
 	 (surface (apply #'sdl:load-and-convert-image arguments))

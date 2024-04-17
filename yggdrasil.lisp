@@ -1,9 +1,6 @@
 (in-package #:yggdrasil)
 
 #||
-Fix up\recheck color-key'ing with draw-image\animation.
-    > Use (color-filter) with color-key
-
 Fix up\write documentation where it's missing.
 
 Fix image-flipping to work horizontally.
