@@ -1,6 +1,8 @@
 (in-package #:yggdrasil)
 
 #||
+Make interesection\collision work with image-name, and not require image-objects
+
 Fix up\write documentation where it's missing.
 
 Fix image-flipping to work horizontally.
@@ -9,7 +11,7 @@ Option for automatic-click interaction on drawn shapes\images
 
 Create an UI-System
 
-Create possibility to compile:
+Create possibility to compile an executable:
    Paths should become relative to executable.
 
 replace loop with iter(?)
@@ -65,7 +67,9 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
            (list :VIDEO-RESIZE-EVENT (rest item)))
 	  ((:pre-window-init :pre-init)
 	   (list :pre-window-form (rest item)))
-	  ((:post-window-init :post-init :init)
+          ((:init :setup :initialization :initialization-step :loading)
+           (list :setup-form (rest item)))
+	  ((:post-window-init :pre-loop-init :pre-loop)
 	   (list :post-window-form (rest item)))))))
 
 (defun get-event-form (form-key list)
@@ -148,15 +152,17 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
                                   
 				  (sdl:clear-display  (if ,clear-color (filter-color ,clear-color) (get-color black)))
                                   ;;Animation update
-                                  ,@(get-event-form :idle-start-form event-forms)
+
+                                  ;; intended for loading
+                                  (when (check-state :setup)
+				    ,@(get-event-form :setup-form event-forms))
                                   
                                   (when (check-state :quit)
                                     (sdl:push-quit-event))
 
-                                  (when (check-state :game)
-                                    
-				    (sdl:with-timestep ()
-				      ,@(get-event-form :timestep-form event-forms)
+				  (sdl:with-timestep ()
+				    ,@(get-event-form :timestep-form event-forms)
+                                    (when (check-state :game)
                                       (update-animations)))
                                   
                                   ,@(get-event-form :pre-auto-draw-form event-forms)
@@ -174,12 +180,27 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 			   (sdl-ttf:quit-ttf)))
          
          ;;; Cleanup section
-	 (setf *images* (make-array 0 :adjustable t :fill-pointer 0)
-	       *auto-draw-list* nil
-               *fonts* nil
-               *animated-sprites-to-animate* nil)))))
+	 (clear-globals)))))
 
-(defmacro start ((&key width height (title "working title") (fps 60)
+(defun free-images (list)
+  "makes sure to free images from memory"
+  (dolist (image list)
+    (sdl:free (image-data image)))
+  ;; Add forced garbage collection here.
+  )
+
+(defun clear-globals ()
+  "deletes, resets or clears out global variables"
+  (free-images *images*)
+  (free-images *auto-draw-list*)
+  
+  (setf *images* nil
+	*auto-draw-list* nil
+        *fonts* nil
+        *state* :setup
+        *animated-sprites-to-animate* nil))
+
+(defmacro start ((&key (width 640) (height 480) (title "working title") (fps 60)
 		    (default-font "vera")
                     (default-font-extention "ttf")
                     resizable

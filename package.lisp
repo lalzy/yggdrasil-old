@@ -51,16 +51,20 @@
    ;;; Alignment
    #:place-within
    
-   ;;; Drawing
+   ;;;Shape Drawing
    #:get-color
    #:set-color
    #:draw-line
    #:draw-rectangle
    #:draw-circle
+
+   ;; Image-stuff
    #:load-image
    #:draw-image
-   #:find-image
    #:flip-image
+   #:find-image
+   #:delete-image
+   #:add-image-to-autodraw
    
    ;; animation
    #:create-animated-sprite

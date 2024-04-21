@@ -1,0 +1,11 @@
+Start macro:
+      Certain sections of the code will not run unless a certain state is activated.
+      Specifically:
+        :init
+
+      This is by design. You'll need to set the state (yg:set-state state) in order for those sections to 'work'.
+
+
+      :init  idle only runs in the :setup stage, so (yg:set-stage :setup) to run that part of code (if you have an :init section in your code).
+
+      Animations - Animations will only auto-update in the :game state, so (yg:set-state :game) to have animations update

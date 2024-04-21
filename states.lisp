@@ -11,7 +11,7 @@
 ;; Support adding new states to any of the 3 main states.
 
 
-(defparameter *state* :setup) ; Default state is menu
+(defparameter *state* :setup) ; Default state is setup, for loading assets etc
 
 (defparameter *states* '(:game :quit :menu :setup)) ; Various states available
 
@@ -21,13 +21,15 @@
       (setf *state* state)))
 
 (defun check-state (state)
+  "checks if passed state is the current state"
   (string= state *state*))
 
 (defmacro with-state (state &body body)
+  "only runs the body when the select state is running"
   `(when (string= ',state *state*)
      ,@body))
 
 (defun add-state (&rest states)
-  "Add all the states to *States* variable"
+  "creates any of the passed states"
   (dolist (state states)
     (push state *states*)))

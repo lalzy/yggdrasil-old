@@ -28,21 +28,57 @@ Size-x\y = where the pixles will separate the cells"
 
 
 ;; Change to use tree
-(defparameter *images* (make-array 0 :adjustable t :fill-pointer 0))
+(defparameter *images* nil)
 (defparameter *auto-draw-list* nil)
 
-(defun remove-image (image-name))
-(defun find-image (image-name)
-  (doarray (image *images*)
-           (when (string-equal (name image) image-name)
-             (return-from find-image image))))
+(defun find-image-helper (image-name in-autodraw)
+  "use the image name[string] to find the image from the list of images in auto-draw"
+  (let ((result (dolist (image (if in-autodraw *auto-draw-list* *images*))
+                  (when (string-equal (name image) image-name)
+                    (return-from find-image-helper image)))))
+    (if result
+        result
+        (error "image named ~s does not exist" image-name))))
+
+(defmethod find-image ((image image) &optional in-autodraw)
+  (find-image-helper (name image) in-autodraw))
+
+(defmethod find-image ((image string) &optional in-autodraw)
+  (find-image-helper image in-autodraw))
+
+(defmacro image-deleter (image list)
+  "replace old list with new list that removed the object"
+  `(progn
+     (sdl:free (image-data image)) ;; Removes sdl-surface from memory when we delete it
+     (setf ,list (remove ,image ,list))
+     ;; Call\force garbage collection here.
+     ))
 
 
-(defun remove-from-auto-draw (image-name))
-(defun add-to-auto-draw (image-name)
-  (push (find-image image-name) *auto-draw-list*))
+(defun delete-image-helper (image-object auto-draw)
+  "picks which list to delete image from"
+  (if auto-draw
+      (image-deleter image-object *auto-draw-list*)
+      (image-deleter image-object *images*)))
+  
+(defmethod delete-image ((image image) &optional auto-draw)
+  (delete-image-helper image auto-draw))
 
-(defun load-image (filename &key (path (get-path image)) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name filename) auto-draw sprite-cells)
+(defmethod delete-image ((image string) &optional auto-draw)
+  (delete-image-helper (find-image image auto-draw) auto-draw))
+
+
+(defun add-image-to-autodraw-helper (image-name)
+  "Adds the passed image [string] to the auto-draw list"
+  (push (find-image image-name t) *auto-draw-list*))
+
+(defmethod add-image-to-autodraw ((image image))
+  (add-image-to-autodraw-helper (name image)))
+
+(defmethod add-image-to-autodraw ((image string))
+  (add-image-to-autodraw-helper image))
+
+(defun load-image (filename &key (path (get-path image)) (x 0) (y 0) color-key color-key-at (alpha #xFF) (image-name (filter-extention filename)) auto-draw sprite-cells)
   (let* ((arguments `(,(create-file-path filename path)
 		      ,@(when color-key (list :color-key (filter-color color-key)))
 		      ,@(when color-key-at (list :color-key-at color-key-at))
@@ -51,7 +87,7 @@ Size-x\y = where the pixles will separate the cells"
 	 (image (make-instance 'image :name image-name :image surface
                                       :w (sdl:width surface) :h (sdl:height surface)
                                       :x x :y y :cells sprite-cells :cell-count (length sprite-cells))))
-    (vector-push-extend image *images*)
+    (push image *images*)
 
     (when sprite-cells
       (setf (sdl:cells (image-data image)) sprite-cells))
@@ -60,15 +96,8 @@ Size-x\y = where the pixles will separate the cells"
       (push image *auto-draw-list*))
     image))
 
-(defun draw-image-with-name (image-name &key x y)
-  (let ((arguments
-	  `( ,(find-image image-name)
-	     ,@(when x (list :x x))
-	     ,@(when y (list :y y)))))
-    (apply #'draw-image arguments)))
-;; (draw-image (find-image image-name) :x x :y y))
 
-(defun flip-image (image &key  (horizontal t) vertical)
+(defun flip-image-helper (image horizontal vertical)
   "Flips the image.
 Parameters:
 
@@ -86,8 +115,17 @@ vertical - flips it vertically"
     (sdl:free (image-data image)) ;; Clean up old image before we set new one
     (setf (image-data image) flipped-image)))
 
+
+
+(defmethod flip-image ((image image) &key (horizontal t) vertical)
+  (flip-image-helper image horizontal vertical))
+
+(defmethod flip-image ((image string) &key (horizontal t) vertical)
+  (flip-image-helper (find-image image) horizontal vertical))
+
+
 ;; Reduntant in SDL, not reduntant with OpenGL whenever I transition
-(defun draw-image (image &key x y cell)
+(defun draw-image-helper (image x y cell)
   ;; Ensure image cordinates is always same as drawn cordinates
   (cond ((typep image 'image)
          (unless (and image (edge-collision-check image t))
@@ -95,3 +133,10 @@ vertical - flips it vertically"
         ((null image)
          (error (format nil "passed variable is empty. You need to provide an image-object")))
         (t (error (format nil "~a is not of type image. You need an yggdrasil:image object" image)))))
+
+(defmethod draw-image ((image image) &key x y cell)
+  (draw-image-helper image x y cell))
+
+(defmethod draw-image ((image string) &key x y cell)
+  (draw-image-helper (find-image image) x y cell))
+

@@ -1,8 +1,5 @@
 (in-package :yggdrasil)
 
-(defmacro sbreak (string &rest arguments)
-  `(break (format nil ,string ,@arguments)))
-
 (defun length-1 (sequence)
   "Returns one less than the length of the sequence."
   (1- (length sequence)))

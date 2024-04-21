@@ -46,7 +46,8 @@ type = the path you're looking for [root, font, image, sound]
 Ex: (get-path font)"
   `(get-path-helper ',type))
 
-(defun filter-extention ())
+(defun filter-extention (filename)
+  (subseq filename 0 (position #\. filename :from-end t)))
 
 ;;; File handling
 (defun create-filename (filename file-extention)
