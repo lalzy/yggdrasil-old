@@ -22,6 +22,8 @@
    #:check-state
    #:with-state
    #:set-state
+   #:get-current-state ; mostly for debugging purposes, generally you'll want with-state or check-state
+   #:add-state
    
    ;;; Math
    #:%-from-total
@@ -59,20 +61,20 @@
    #:draw-circle
 
    ;; Image-stuff
-   #:load-image
-   #:draw-image
-   #:flip-image
-   #:find-image
-   #:delete-image
-   #:add-image-to-autodraw
+   #:load-image ; Create an image
+   #:draw-image ; draws either an image, or an animation object
+   #:flip-image ; flips either an image, or an animation object
+   #:find-image ; find image, either through image-name, or the image-object itself.
+   #:delete-image ; removing created image.
+   #:add-image-to-autodraw ; adds the image to auto-draw
    
    ;; animation
-   #:create-animated-sprite
-   #:draw-animation
-   #:play-animation
-   #:update-animations
-   #:is-animation-playing?
-   #:flip-animation
+   #:create-animated-sprite ; Crates an animated sprite
+   #:draw-animation ; alternative to draw-image for animation-object, redirects to draw-image
+   #:play-animation ; Sets the animation to be playing in game-state
+   #:update-animations ; to update the animation if you're not in a game-state
+   #:is-animation-playing? ; Check wether animation is running or not
+   #:flip-animation ; alternative to draw-image for animation-object, redirects to draw-image
    #:pause-animation
    
    ;;; Drawing-Helper

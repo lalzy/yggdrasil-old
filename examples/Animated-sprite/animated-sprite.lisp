@@ -36,24 +36,24 @@
   (yg:play-animation (idle player))
 
   ;; Draws the actual sprite with the current animation as iterated through by play-animation.
-  (yg:draw-animation (idle player) :x (yg:x player) :y (yg:y player)))
+  (yg:draw-image (idle player) :x (yg:x player) :y (yg:y player)))
 
 
 (defun flip (player &optional vertical)
   ;; This flips the image, then reverse the cell-list to match.
   ;;  Can be expensive so might want to keep it as a separate object to reference when it needs to be flipped.
-  (yg:flip-animation (idle player) :horizontal (not vertical) :vertical vertical) 
-  (yg:flip-animation (attack player) :horizontal (not vertical) :vertical vertical)
-  (yg:flip-animation (move player) :horizontal (not vertical) :vertical vertical))
+  (yg:flip-image (idle player) :horizontal (not vertical) :vertical vertical) 
+  (yg:flip-image (attack player) :horizontal (not vertical) :vertical vertical)
+  (yg:flip-image (move player) :horizontal (not vertical) :vertical vertical))
 
 (defun draw-attack (player)
   (if (yg:is-animation-playing? (attack player)) ; Helper function to check if the current animation is playing or not.
-      (yg:draw-animation (attack player) :x (yg:x player) :y (yg:y player)) ; Using the yg:x and yg:y to get the positioning data. This is actually redundant (see base-example).
+      (yg:draw-image (attack player) :x (yg:x player) :y (yg:y player)) ; Using the yg:x and yg:y to get the positioning data. This is actually redundant (see base-example).
       (setf (state player) 'idle)))
 
 (defun draw-movement (player)
   (yg:play-animation (move player))
-  (yg:draw-animation (move player) :x (yg:x player) :y (yg:y player)))
+  (yg:draw-image (move player) :x (yg:x player) :y (yg:y player)))
 
 (defun main (&optional (asset-path (asdf:system-relative-pathname :yggdrasil-examples "animated-sprite/assets/"))
              &aux (width 640) (height 480) (title "animated sprite example - timestep"))

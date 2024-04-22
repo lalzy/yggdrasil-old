@@ -13,6 +13,8 @@
    (vertically-flipped :initform nil :accessor vertically-flipped
                        :documentation "wether the image has been flipped or not")
    (horizontally-flipped :initform nil :accessor horizontally-flipped)
+   ;;; Only used for the animation system.
+   ;;; It is defined here due to auto-drawing so we can have auto-drawing without more variables, and get animations as well.
    (current-cell :initform 0 :accessor current-cell)
    (cell-count :initarg :cell-count :accessor cell-count
                :documentation "Amount of cells the image has"))
@@ -54,6 +56,7 @@ Size-x\y = where the pixles will separate the cells"
      (sdl:free (image-data image)) ;; Removes sdl-surface from memory when we delete it
      (setf ,list (remove ,image ,list))
      ;; Call\force garbage collection here.
+     (trivial-garbage:gc :full t)
      ))
 
 

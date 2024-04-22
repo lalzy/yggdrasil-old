@@ -1,17 +1,19 @@
 (in-package #:yggdrasil)
 
 #||
-named-animation system, similar to named-images.
+named-animation system, similar to named-images. with *animated-sprites*
 
 Make interesection\collision work with image-name, and not require image-objects
 
 Fix up\write documentation where it's missing.
 
-Fix image-flipping to work horizontally.
+make animations work in other states than just game.
+       > Do this by making play-animation take an optional argument that's the state.
+            possibly by redoing animation to be a key'ed list instead, containing state > list of animations (as objects) to play(?)
+
+create ability to delete 'all' images\animations with a single call to (remove-all-images)
 
 Option for automatic-click interaction on drawn shapes\images
-
-Create an UI-System
 
 Create possibility to compile an executable:
    Paths should become relative to executable.
@@ -20,7 +22,12 @@ replace loop with iter(?)
 
 ability to loop animations without having to specify to draw it
 ability to pause animations
-Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw functionalities (when re-implemented properly) 
+Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw functionalities (when re-implemented properly)
+
+
+-- Severily deprioritized.
+Create an UI-System
+
 ||#
 
 (declaim (optimize (speed 3)))
@@ -28,24 +35,25 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 (defparameter *width* nil)
 (defparameter *height* nil)
 
-(defun free-images (list)
+(defmacro free-image-list (list)
   "makes sure to free images from memory"
-  (dolist (image list)
-    (sdl:free (image-data image)))
-  ;; Add forced garbage collection here.
-  )
+  (let ((image (gensym)))
+    `(progn
+       (dolist (,image ,list)
+         (sdl:free (image-data ,image)))
+       (setf ,list nil))))
 
 (defun clear-globals ()
   "deletes, resets or clears out global variables"
-  (free-images *images*)
-  (free-images *auto-draw-list*)
-  
   (setf *asset-paths* (init-asset-paths-global)
-        *images* nil
-        *auto-draw-list* nil
         *fonts* nil
         *state* :setup
-        *animated-sprites-to-animate* nil))
+        *animated-sprites-to-animate* nil)
+  (free-image-list *images*)
+  (free-image-list *auto-draw-list*)
+  ;; Shares images with *animated-sprites-to-animate* so don't have to do it for both
+  (free-image-list *animated-sprites*) 
+  (trivial-garbage:gc :full t))
 
 (defun init-paths (asset-path font-path image-path)
   (set-path root asset-path)

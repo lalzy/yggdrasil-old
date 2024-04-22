@@ -6,7 +6,7 @@
   :license  "BSD3"
   :version "0.0.1"
   :serial t
-  :depends-on (#:lispbuilder-sdl #:lispbuilder-sdl-image  #:lispbuilder-sdl-gfx #:lispbuilder-sdl-ttf
+  :depends-on (#:lispbuilder-sdl #:lispbuilder-sdl-image  #:lispbuilder-sdl-gfx #:lispbuilder-sdl-ttf #:trivial-garbage
 		#:closer-mop #:cl-gamepad #:bordeaux-threads #:iterate  #:lispbuilder-sdl-ttf)
   :components ((:file "package")
                (:file "types-and-predicates")

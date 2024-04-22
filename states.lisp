@@ -15,6 +15,10 @@
 
 (defparameter *states* '(:game :quit :menu :setup)) ; Various states available
 
+(defun get-current-state ()
+  "returns the current state, mostly for debugging"
+  *state*)
+
 (defun set-state (state)
   "Sets the game state"
   (if (member state *states*)
