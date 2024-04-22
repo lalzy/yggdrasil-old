@@ -5,5 +5,7 @@
   :license  "MIT License"
   :serial t
   :depends-on (#:yggdrasil)
-  :components ((:file "Animated-sprite/animated-sprite") ; How to use the animation system
-	       )) 
+  :components (
+               (:file "Simple-rectangles/simple-rectangles") ; Two simple examples to draw a rectangle
+               (:file "Animated-sprite/animated-sprite") ; How to use the animation system
+	       ))

@@ -23,25 +23,29 @@
                             :color (yg:get-color green) :filled t)))))
 
 
-
+;; Test no-asset path loading lisp to see if error-handling is done correctly.
 (defun main3 ()
-  (let (image)
-    (yg:start
-        (:asset-path *asset-path*)
-        (:init ;(setf image
-         (yg:load-image "lisp.png" :auto-draw t :x 50 :y 50)
-         (yg:flip-image "lisp" :vertical t)
-                     ;)
-                     (yg:set-state :game))
-        (:key-down
-         (cond ((yg:is-key :s)
-                
-                (yg::delete-image "lisp" t))
-               (t (yg::delete-image "lisp")))
-         (format t "deleted!"))
-        (:draw
-         (yg:draw-image "lisp" :x 300 :y 300))
-        )))
+  
+  (yg:start
+   (:asset-path *asset-path*)
+   (:init
+    (yg:load-image "lisp.png")
+    (yg:set-state :game))
+   (:draw
+    (yg:draw-image "lisp")
+    (yg:draw-image "lisp" :x 300 :y 300))))
+
+
+(defun main4 ()
+  (let (animation)
+  (yg:start
+      (:asset-path (asdf:system-relative-pathname :yggdrasil "examples/Animated-sprite/assets/"))
+      (:init
+       (setf animation (yg:create-animated-sprite "idle.png" (yg:allocate-cells 720 80 120 80) :interval 10 :start-playing t :auto-draw t :x 50 :y 50))
+       (yg:set-state :game))
+      (:draw ;(yg:play-animation animation)
+             ))))
+
 
 (defclass ball (yg:circle)
   ((map-pos :initarg :mappos :accessor map-pos)

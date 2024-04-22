@@ -22,7 +22,7 @@
 
 (defun draw-animation (animation-object &key x y)
   (let ((sprite (sprite animation-object)))
-    (draw-image (sprite animation-object) :x (if x x (x sprite)) :y (if y y (y sprite)) :cell (current-animation animation-object))))
+    (draw-image (sprite animation-object) :x (if x x (x sprite)) :y (if y y (y sprite)) :cell (current-cell (sprite animation-object)))))
 
 (defun play-animation (animation-object)
   (unless (find animation-object *animated-sprites-to-animate*)
@@ -35,13 +35,13 @@
 (defun next-animation-cell (animation-object)
   "returns object when finished, otherwise returns nil"
   (if (>= (animation-counter animation-object) (animation-interval animation-object))
-      (progn (if (>= (current-animation animation-object) (1- (cell-count (sprite animation-object))))
+      (progn (if (>= (current-cell (sprite animation-object)) (1- (cell-count (sprite animation-object))))
                  (progn
-                   (setf (current-animation animation-object) 0)
+                   (setf (current-cell (sprite animation-object)) 0)
                    (setf (animation-counter animation-object) 0)
                    (setf *animated-sprites-to-animate* (remove animation-object *animated-sprites-to-animate*)))
                  
-                 (incf (current-animation animation-object)))
+                 (incf (current-cell (sprite animation-object))))
              (setf (animation-counter animation-object) 0))
       (incf (animation-counter animation-object)))
   nil)

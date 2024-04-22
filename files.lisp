@@ -1,7 +1,11 @@
 (in-package :yggdrasil)
 
+(defun init-asset-paths-global ()
+  (let ((content '("" "" "" "")))
+    (make-array (length content) :initial-contents content)))
+
 ;;; asset-path = #([root] [fonts] [images] [sounds]) 
-(defparameter *asset-paths* (let ((content '("" "" "" ""))) (make-array (length content) :initial-contents content)))
+(defparameter *asset-paths* (init-asset-paths-global))
 
 (defun path-slash-filter (path)
   "trims out trailing / and \\ then adds one to the end to ensure paths are always valid paths"

@@ -2,7 +2,7 @@
 ;;; Example for how to utilize the animated-sprite system for Yggdrasil.
 (defpackage #:examples-animated-sprite
   (:use #:cl)
-  (:nicknames #:as)
+  (:nicknames #:yg-ex-as #:ex-as)
   (:export #:main #:start))
 
 (in-package #:examples-animated-sprite)
@@ -38,12 +38,13 @@
   ;; Draws the actual sprite with the current animation as iterated through by play-animation.
   (yg:draw-animation (idle player) :x (yg:x player) :y (yg:y player)))
 
-(defun flip (player)
+
+(defun flip (player &optional vertical)
   ;; This flips the image, then reverse the cell-list to match.
   ;;  Can be expensive so might want to keep it as a separate object to reference when it needs to be flipped.
-  (yg:flip-animation (idle player)) 
-  (yg:flip-animation (attack player))
-  (yg:flip-animation (move player)))
+  (yg:flip-animation (idle player) :horizontal (not vertical) :vertical vertical) 
+  (yg:flip-animation (attack player) :horizontal (not vertical) :vertical vertical)
+  (yg:flip-animation (move player) :horizontal (not vertical) :vertical vertical))
 
 (defun draw-attack (player)
   (if (yg:is-animation-playing? (attack player)) ; Helper function to check if the current animation is playing or not.
@@ -88,7 +89,8 @@
                               (not (equal (direction player) 'right)))
                          (flip player)
                          (setf (direction player) 'right))
-
+                        ((or (yg:is-key :up) (yg:is-key :down))
+                         (flip player t))
                         ((yg:is-key :z)
                          (setf (state player) 'attack)
                          (yg:play-animation (attack player)))

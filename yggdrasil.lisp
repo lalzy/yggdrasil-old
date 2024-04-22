@@ -1,6 +1,8 @@
 (in-package #:yggdrasil)
 
 #||
+named-animation system, similar to named-images.
+
 Make interesection\collision work with image-name, and not require image-objects
 
 Fix up\write documentation where it's missing.
@@ -16,6 +18,8 @@ Create possibility to compile an executable:
 
 replace loop with iter(?)
 
+ability to loop animations without having to specify to draw it
+ability to pause animations
 Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw functionalities (when re-implemented properly) 
 ||#
 
@@ -23,6 +27,25 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
 
 (defparameter *width* nil)
 (defparameter *height* nil)
+
+(defun free-images (list)
+  "makes sure to free images from memory"
+  (dolist (image list)
+    (sdl:free (image-data image)))
+  ;; Add forced garbage collection here.
+  )
+
+(defun clear-globals ()
+  "deletes, resets or clears out global variables"
+  (free-images *images*)
+  (free-images *auto-draw-list*)
+  
+  (setf *asset-paths* (init-asset-paths-global)
+        *images* nil
+        *auto-draw-list* nil
+        *fonts* nil
+        *state* :setup
+        *animated-sprites-to-animate* nil))
 
 (defun init-paths (asset-path font-path image-path)
   (set-path root asset-path)
@@ -182,36 +205,24 @@ Rewrite animated-sprite to be more 'up-to-date' and utilizing the auto-draw func
          ;;; Cleanup section
 	 (clear-globals)))))
 
-(defun free-images (list)
-  "makes sure to free images from memory"
-  (dolist (image list)
-    (sdl:free (image-data image)))
-  ;; Add forced garbage collection here.
-  )
-
-(defun clear-globals ()
-  "deletes, resets or clears out global variables"
-  (free-images *images*)
-  (free-images *auto-draw-list*)
-  
-  (setf *images* nil
-	*auto-draw-list* nil
-        *fonts* nil
-        *state* :setup
-        *animated-sprites-to-animate* nil))
-
 (defmacro start ((&key (width 640) (height 480) (title "working title") (fps 60)
 		    (default-font "vera")
                     (default-font-extention "ttf")
                     resizable
                     (dt 10)
 		    (auto-draw t)
-                    (asset-path (asdf:system-relative-pathname (intern (package-name *package*)) ""))
+                    (asset-path
+                     ;; If the ASDF system is not the same as the package-name this won't work,
+                     ;; so we'll default to an empty string in that case
+                     (handler-case
+                         (asdf:system-relative-pathname (intern (package-name *package*)) "")
+                       (error (c) "")))
                     (font-path "")
                     (image-path "")
                     (icon-filename)
                     (icon-path asset-path)
-		    clear-color) &rest body)
+		    clear-color)
+                 &rest body)
   "Arguments:
 :width (integer): Width of the window.
 :height (integer): Height of the window.
