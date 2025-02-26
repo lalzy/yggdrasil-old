@@ -158,9 +158,17 @@ vertical - flips it vertically"
            (error (format nil "passed variable is empty. You need to provide an image-object")))
           (t (error (format nil "~a is not of type image. You need an yggdrasil:image object" image))))))
 
-(defmethod draw-image ((image image) &key x y (cell (current-cell image)))
+(defmethod draw-image ((image image) &key x y cell)
+  (unless cell (setf cell (current-cell image)))
   (draw-image-helper image x y cell))
 
-(defmethod draw-image ((image string) &key x y (cell (current-cell image)))
+(defmethod draw-image ((image string) &key x y cell)
   (draw-image-helper (find-image image) x y cell))
 
+
+;;; Create ability to draw images ontop of images, both existing images as defined by Yggdrasil,
+;;;   and by initially loading an SDL image and immediately drawing it ontop of an Yggdrasil image.
+
+(defun merge-images (original to-add &key (x 0 ) (y 0))
+  "Draws the to-add image ontop of the original"
+  (sdl:draw-surface-at-* (image-data to-add) x y :surface (image-data original)))

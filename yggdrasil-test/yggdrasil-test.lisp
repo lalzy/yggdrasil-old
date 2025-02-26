@@ -32,7 +32,7 @@
     (yg:load-image "lisp.png")
     (yg:set-state :game))
    (:draw
-    (yg:draw-image "lisp")
+    (yg:draw-image "lisp")1
     (yg:draw-image "lisp" :x 300 :y 300))))
 
 
@@ -101,3 +101,22 @@
          (draw-ball *ball*)
          ))))
    :name title))
+
+
+;; Test no-asset path loading lisp to see if error-handling is done correctly.
+(defun main5 ()
+  
+  (yg:start
+   (:asset-path *asset-path*)
+   (:init
+    (yg:load-image "ani2.bmp")
+    (yg:load-image "lisp.png")
+    (yg::merge-images  (yg:find-image "ani2") (yg:find-image "lisp")  :x 45 :y 15)
+    (incf (yg:x (yg:find-image "ani2")) 50)
+    (yg:set-state :game))
+   (:draw
+   ; (yg:draw-image "lisp")
+    (yg:draw-image "ani2")
+   ; (yg:draw-image "lisp" :x 300 :y 300)
+    )))
+

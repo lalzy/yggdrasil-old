@@ -213,6 +213,7 @@ Create an UI-System
          ;;; Cleanup section
 	 (clear-globals)))))
 
+;; (passed-parameters (cdr sb-ext:*posix-argv*)) ; Passed executable arguments.
 (defmacro start ((&key (width 640) (height 480) (title "working title") (fps 60)
 		    (default-font "vera")
                     (default-font-extention "ttf")
