@@ -5,7 +5,7 @@
 ### reason for deprecation:
 I watched lectures on how to build an game-engine, and in doing so also learned about ECS (Entity Component System). While this could have been made into this engine, since it requires fundemental different architecture (much of this engine is tied to CLOS in an non-trivial way), I decided to start "over". Much of the core identity of Yggdrasil-old is retained in it's successor. Such as the start macro, and the pass initialization/window-params as parameters to start.
 
-As such, the successor was made with an ECS in mind, however I found that making the ECS an optional-feature, served th engine (and potentionally game devs) better, than enforced ECS design. I also built the concept of the engine, and ECS with SDL as the renderer, but, like with Yggdrasil-old, I ensured no direct SDL calls within the engine itself (unlike the predecessor (SHF)[https://github.com/lalzy/SHF]), and so between 0.1.3 and 0.1.5, I created my own (openGL based) renderer for it. 
+As such, the successor was made with an ECS in mind, however I found that making the ECS an optional-feature, served th engine (and potentionally game devs) better, than enforced ECS design. I also built the concept of the engine, and ECS with SDL as the renderer, but, like with Yggdrasil-old, I ensured no direct SDL calls within the engine itself (unlike the predecessor [SHF](https://github.com/lalzy/SHF]), and so between 0.1.3 and 0.1.5, I created my own (openGL based) renderer for it. 
 
 The successors renderer, utilize the same calls for "immediate" draw calls, and the ECS draw calls, and the same rendering calls for both world-space, and screen space.
 
