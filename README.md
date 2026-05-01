@@ -27,14 +27,13 @@ Very quick and simple example of how to use the engine to draw an solid coloured
 Examples for how to use the various components for the engine can be found in the examples folders. You can call the examples by calling `(ql:quickload :yggdrasil-examples)` then call the individual examples. Like so: `(animated-sprites:main)`
 
 
-The current plans for the engine are in no particular order:
-
-multi-res \ Aspect-Ratio support by default for anything drawn.
-Save-system
-Ability to read tile-maps
-Proper error-handling (Message-Box when compiled) that works for both Windows and Linux.
-An UI system (scrollbars, textfields, window-frames, buttons, etc).
-Proper collisions, and\or physics engine (probably tied to Box2D)
-Object-rotation (semi-implemented) + collision for said rotated objects
-OpenGL for rendering (definitely no ETA, everything is designed so that if using the engine, when this switch happens it won't affect anything made with the engine)
-Better sound-system (third-party sound-library, openAl?)
+The plans for the engine were (but was abandoned in favor of it's successor, which is not public at time of writing):
+- multi-res \ Aspect-Ratio support by default for anything drawn. (in successor)
+- Save-system
+- Ability to read tile-maps
+- Proper error-handling (Message-Box when compiled) that works for both Windows and Linux.
+- An UI system (scrollbars, textfields, window-frames, buttons, etc).
+- Proper collisions, and\or physics engine (collision is in successor, physics is planned 0.5)
+- Object-rotation (semi-implemented) + collision for said rotated objects (in successor)
+- OpenGL for rendering (in successor)
+- Better sound-system with third-party sound-library (planned for successor 0.3, so for public release. At time of writing successor is ~0.2)
