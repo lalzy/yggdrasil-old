@@ -1,5 +1,7 @@
 # yggdrasil
 
+# This engine is deprecated and not suggested for use. It exist for historical purposes.
+
 Simply put, it's a simple 2D engine built atop of Lispbuilder-sdl(SDL 1.2). Lispbuilder-sdl was chosen as SDL2-ttf is too outdated and can't be used with modern SDL2.
 
 The aim for the engine is to abstract away from SDL, and generally 'low-level' calls, and instead automate as much as can be automated (like sprites, collisions, etc).
